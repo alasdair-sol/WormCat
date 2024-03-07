@@ -1,0 +1,38 @@
+﻿@page
+@model WormCat.Razor.Pages.Containers.IndexModel
+
+@{
+    ViewData["Title"] = "Containers";
+}
+
+<h1>Containers</h1>
+
+<p>Containers differ from <a class="nav-link text-dark" asp-area="" asp-page="/Locations/Index">Locations</a> in that they are defined as a collection of books. The Location of this container can be moved without modifying the Container itself.</p>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Container[0].Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Container) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

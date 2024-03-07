@@ -1,0 +1,98 @@
+﻿@page
+@using WormCat.Library.Utility
+@model WormCat.Razor.Pages.Locations.IndexModel
+@inject IAuthDisplayUtility authDisplayUtility;
+
+@{
+    ViewData["Title"] = "Locations";
+}
+
+@* <p>Locations differ from <a class="nav-link text-dark" asp-area="" asp-page="/Containers/Index">Containers</a> in that they are defined as a physical location for a collection of books to reside.</p> *@
+
+@* Search Bar *@
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Your Locations</h2>
+        </div>
+        <div class="col-md-2">
+            <a asp-page-handler="SeedDatabase" class="btn btn-primary w-100">Seed</a>
+        </div>
+        <div class="col-md-4 d-flex align-items-center">
+            <form class="justify-content-center flex-grow-1">
+                <input placeholder="Search..." class="w-100" asp-for="query" />
+            </form>
+        </div>
+    </div>
+</div>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+
+@*
+    Filter & Group the Locations by the number of columns we want
+    Then we can iterate over each row
+*@
+@foreach (var row in Model.Location.Select((item, index) => new { item, index }).GroupBy(_ => _.index / 3, _ => _.item))
+{
+    <div class="row mb-2">
+        @foreach (var location in row)
+        {
+            <div class="col-md">
+                <div class="container col  h-100">
+                    <div class="card col  h-100" style="">
+                        <div class="row g-0 h-100">
+                            <div class="card-body h-100 d-flex flex-column">
+                                <div class="row">
+                                    <div class="col-lg">
+                                        <h5 class="card-title">@location.Name</h5>
+                                    </div>
+                                    <div class="col-lg">
+                                        <p class="card-text text-left">
+                                            @location.StreetNumber @location.StreetName
+                                            <br />@location.City
+                                            <br />@location.PostCode
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row mt-auto">
+                                    <div class="card-body justify-content-center d-flex flex-column align-items-center h-100">
+
+                                        <a asp-page="/Locations/Edit" asp-route-id="@location.Id" class="btn btn-primary @authDisplayUtility.CSSAuthDisabled mb-2 w-100 d-flex align-items-center justify-content-center">
+                                            @if (User?.Identity?.IsAuthenticated == false)
+                                            {
+                                                <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                                            }
+                                            <span>Edit</span>
+                                        </a>
+
+                                        <a asp-page="/Locations/Delete" asp-route-id="@location.Id" class="btn btn-danger @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center">
+                                            @if (User?.Identity?.IsAuthenticated == false)
+                                            {
+                                                <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                                            }
+                                            <span>Delete</span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (row.Count() != 3)
+        {
+            @for (var i = 0; i < 3 - (row.Count() % 3); i++)
+            {
+                <div class="col-md">
+                    &nbsp;
+                </div>
+            }
+
+        }
+    </div>
+}

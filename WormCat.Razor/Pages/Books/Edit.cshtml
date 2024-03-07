@@ -1,0 +1,55 @@
+﻿@page
+@model WormCat.Razor.Pages.Books.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit Copy of @Model.Book.Record?.Title [@Model.Book.Id]</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Book.Id" />
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Book.OnLoan" /> @Html.DisplayNameFor(model => model.Book.OnLoan)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="Book.OwnerId" class="control-label"></label>
+                <input asp-for="Book.OwnerId" class="form-control" />
+                <span asp-validation-for="Book.OwnerId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Book.Barcode" class="control-label"></label>
+                <input asp-for="Book.Barcode" class="form-control" />
+                <span asp-validation-for="Book.Barcode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Book.Record" class="control-label"></label>
+                <select asp-for="Book.RecordId" class="form-control" asp-items="Model.Records"></select>
+                <span asp-validation-for="Book.Record" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Book.Container" class="control-label"></label>
+                <select asp-for="Book.ContainerId" asp-items="Model.Containers"></select>
+                <span asp-asp-validation-for="Book.Container" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

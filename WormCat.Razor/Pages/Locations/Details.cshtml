@@ -1,0 +1,48 @@
+﻿@page
+@model WormCat.Razor.Pages.Locations.DetailsModel
+
+@{
+    ViewData["Title"] = Model.Location.Name;
+}
+
+<h1>@Model.Location.Name</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Location.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Location.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Location.StreetNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Location.StreetNumber)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Location.StreetName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Location.StreetName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Location.City)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Location.City)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Location.PostCode)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Location.PostCode)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.Location.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

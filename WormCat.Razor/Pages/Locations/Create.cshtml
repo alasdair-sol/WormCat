@@ -1,0 +1,53 @@
+﻿@page
+@model WormCat.Razor.Pages.Locations.CreateModel
+
+@{
+    ViewData["Title"] = "New Location";
+}
+
+<h1>New Location</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Location.Name" class="control-label"></label>
+                <input asp-for="Location.Name" class="form-control" />
+                <span asp-validation-for="Location.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location.StreetNumber" class="control-label"></label>
+                <input asp-for="Location.StreetNumber" class="form-control" />
+                <span asp-validation-for="Location.StreetNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location.StreetName" class="control-label"></label>
+                <input asp-for="Location.StreetName" class="form-control" />
+                <span asp-validation-for="Location.StreetName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location.City" class="control-label"></label>
+                <input asp-for="Location.City" class="form-control" />
+                <span asp-validation-for="Location.City" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location.PostCode" class="control-label"></label>
+                <input asp-for="Location.PostCode" class="form-control" />
+                <span asp-validation-for="Location.PostCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

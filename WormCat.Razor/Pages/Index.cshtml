@@ -1,0 +1,106 @@
+﻿@page
+@using WormCat.Library.Utility
+@inject IAuthDisplayUtility authDisplayUtility;
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+
+    @if (Model.action == "1")
+    {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $("#modalDatabaseSeeded").modal("show");
+            });
+        </script>
+    }
+}
+
+<!-- Modal -->
+<div class="modal fade" id="modalDatabaseSeeded" tabindex="-1" aria-labelledby="modalDatabaseSeededLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDatabaseSeededLabel">Database Seeded</h5>
+            </div>
+            <div class="modal-body">
+                The WormCat database has been successfully seeded.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Okay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Search Bar *@
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Your Collection</h2>
+        </div>
+        <div class="col-md-2">
+            <a asp-page-handler="SeedDatabase" class="btn btn-primary w-100">Seed</a>
+        </div>
+        <div class="col-md-4 d-flex align-items-center">
+            <form class="justify-content-center flex-grow-1">
+                <input placeholder="Search..." class="w-100" asp-for="query" />
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Records View *@
+<div class="container pt-2">
+    @for (int i = 0; i < Model.Records.Count; i++)
+    {
+        <div class="row mb-2 ">
+            <div class="card col" style="">
+                <div class="row g-0">
+                    <div class="col-sm-2 text-center">
+                        <img src="data:image/jpg;base64, @RecordUtility.GetRecordBase64Image(Model.Records[i])" class="img-fluid rounded-start pt-2 pb-2" alt="..." style="max-height:10em">
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card-body">
+                            <h5 class="card-title">@Model.Records[i].Title</h5>
+                            <p class="card-text">@Model.Records[i].Description</p>
+                            @if (RecordUtility.RecordHasAvailableCopy(Model.Records[i]))
+                            {
+                                @if (RecordUtility.GetRecordUniqueContainers(Model.Records[i]).Count() > 1)
+                                {
+                                    <p class="card-text text-muted">
+                                        Available in [<a asp-page="/Containers/Details" asp-route-id="@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Id">@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Name</a>, and more..]
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p class="card-text text-muted">
+                                        Available in [<a asp-page="/Containers/Details" asp-route-id="@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Id">@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Name</a>]
+                                    </p>
+                                }
+                            }
+                            else
+                            {
+                                <p class="card-text text-danger">Not available</p>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-body justify-content-center d-flex flex-column align-items-center h-100">
+                            <a asp-page="/Records/Details" asp-route-id="@Model.Records[i].Id" class="btn btn-primary mb-2 w-100">View</a>
+                            <a asp-page="/Records/Edit" asp-route-id="@Model.Records[i].Id" class="btn btn-@authDisplayUtility.CSSAuthColour @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center">
+                                @if (User?.Identity?.IsAuthenticated == false)
+                                {
+                                    <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                                }
+                                <span>Edit</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</div> 

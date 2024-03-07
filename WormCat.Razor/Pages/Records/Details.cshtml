@@ -1,0 +1,151 @@
+﻿@page
+@using WormCat.Library.Utility
+@inject IAuthDisplayUtility authDisplayUtility;
+@model DetailsModel
+@{
+    ViewData["Title"] = Model.Record.Title;
+
+
+    var queryParams = new Dictionary<string, string>
+    {
+        { "record", Model.Record.Id.ToString() },
+    };
+
+    var x = 0;
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Viewing Record</h2>
+        </div>
+    </div>
+</div>
+
+<div class="container pt-2">
+    <div class="row mb-2 ">
+
+        @* Image and Edit Record *@
+        <div class="col-sm-3 text-center pl-3 pr-3">
+            <img src="data:image/jpg;base64, @RecordUtility.GetRecordBase64Image(Model.Record)" class="img-fluid rounded-start pt-2 pb-2" alt="..." style="">
+
+            <a asp-page="/Records/Edit" asp-route-id="@Model.Record.Id" class="btn btn-@authDisplayUtility.CSSAuthColour @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center">
+                @if (User?.Identity?.IsAuthenticated == false)
+                {
+                    <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                }
+                <span>Edit</span>
+            </a>
+
+        </div>
+
+        @* Card Info & Copies *@
+        <div class="col-sm-9 flex-column align-items-start d-flex mt-2 mb-2">
+
+            <h2>@Model.Record.Title</h2>
+            <p>@Model.Record.Description</p>
+
+            @* Metadata *@
+            <span class="text-muted">ISBN - @(Model.Record.ISBN ?? "Unknown") <br /></span>
+
+            <br />
+
+            <div class="row w-100">
+                <div class="col">
+                    <h5 class="text-primary">Copies</h5>
+                </div>
+                <div class="col-auto pr-0">
+                    <a asp-page-handler="CreateNewCopy" asp-route-id="@Model.Record.Id" class="btn btn-@authDisplayUtility.CSSAuthColour @authDisplayUtility.CSSAuthDisabled ml-2 mr-2 w-100 d-flex align-items-center justify-content-center">
+                        @if (User?.Identity?.IsAuthenticated == false)
+                        {
+                            <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                        }
+                        <span>New Copy</span>
+                    </a>
+                </div>
+            </div>
+            @if (Model.Record.Books.Count > 0)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Record.Title)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Record.Books[0].OwnerId)
+                            </th>
+                            <th>
+                                Availability
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Record.Books)
+                        {
+                            x++;
+
+                            if (item == null) continue;
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => Model.Record.Title)
+                                </td>
+                                <td>
+                                    @if (string.IsNullOrWhiteSpace(item.OwnerId) == false)
+                                    {
+                                        @Html.DisplayFor(modelItem => item.OwnerId)
+                                        ;
+                                    }
+                                    else
+                                    {
+                                        <span>No Owner</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.OnLoan)
+                                    {
+                                        <p class="card-text text-danger">On Loan</p>
+                                    }
+                                    else if (item.Container != null)
+                                    {
+                                        <p class="card-text text-muted">Available in [<a asp-page="/Containers/Details" asp-route-id="@item.Container.Id">@item.Container.Name</a>]</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="card-text text-danger">Not available</p>
+                                    }
+                                </td>
+                                <td class="">
+                                    <a asp-page="/Books/Edit" asp-route-id="@item.Id" class="btn btn-primary w-100 position-relative @authDisplayUtility.CSSAuthDisabled">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+
+                                        @if (User?.Identity?.IsAuthenticated == false)
+                                        {
+                                            <i class="fa-solid fa-lock mr-2 ml-n2 position-absolute btn btn-primary" style="font-size:0.8rem; padding:5px; border-radius:100%; right:5px; top:5px; transform: translate(100%, -50%);"></i>
+                                        }
+
+                                    </a>
+                                </td>
+                                <td>
+                                    <a asp-page="/Books/Delete" asp-route-id="@item.Id" class="btn btn-danger w-100 position-relative @authDisplayUtility.CSSAuthDisabled">
+                                        <i class="fa-solid fa-trash"></i>
+
+                                        @if (User?.Identity?.IsAuthenticated == false)
+                                        {
+                                            <i class="fa-solid fa-lock mr-2 ml-n2 position-absolute btn btn-danger" style="font-size:0.8rem; padding:5px; border-radius:100%; right:5px; top:5px; transform: translate(100%, -50%);"></i>
+                                        }
+
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-danger">No copies available</p>
+            }
+        </div>
+    </div>
+</div>
