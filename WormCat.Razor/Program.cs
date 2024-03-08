@@ -4,6 +4,7 @@ using WormCat.Razor.Data;
 using WormCat.Data.Data;
 using WormCat.Razor.Models;
 using WormCat.Library.Utility;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = CreateBuilder(args);
 
@@ -87,9 +88,9 @@ static void ConfigureIdentity(ConfigurationManager configuration, IServiceCollec
     services.AddAuthentication();
     services.AddAuthorization(options =>
     {
-        //options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        //    .RequireAuthenticatedUser()
-        //    .Build();
+        /*options.FallbackPolicy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();*/
     });
 
     services.AddHttpContextAccessor();

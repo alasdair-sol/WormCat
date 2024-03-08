@@ -1,52 +1,48 @@
 ﻿@page
-@using WormCat.Library.Utility
 @model WormCat.Razor.Pages.Locations.IndexModel
-@inject IAuthDisplayUtility authDisplayUtility;
+
+@using WormCat.Library.Utility
+@inject IAuthDisplayUtility authDisplayUtility
 
 @{
     ViewData["Title"] = "Locations";
 }
 
-@* <p>Locations differ from <a class="nav-link text-dark" asp-area="" asp-page="/Containers/Index">Containers</a> in that they are defined as a physical location for a collection of books to reside.</p> *@
-
-@* Search Bar *@
+@* Title bar *@
 <div class="container">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-sm">
             <h2>Your Locations</h2>
         </div>
-        <div class="col-md-2">
-            <a asp-page-handler="SeedDatabase" class="btn btn-primary w-100">Seed</a>
-        </div>
-        <div class="col-md-4 d-flex align-items-center">
-            <form class="justify-content-center flex-grow-1">
-                <input placeholder="Search..." class="w-100" asp-for="query" />
-            </form>
+        <div class="col-sm-auto">
+            <a asp-page="Create" class="w-100 btn btn-primary d-md-none"><i class="fa-solid fa-plus"></i> Add New</a>
         </div>
     </div>
+
+    <p>Locations are physical places where you can store collections of books. For example, you may have a location for your home, office, and storage unit. Each location can store multiple containers.</p>
 </div>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
 
-@*
-    Filter & Group the Locations by the number of columns we want
-    Then we can iterate over each row
-*@
+@* Main content *@
 @foreach (var row in Model.Location.Select((item, index) => new { item, index }).GroupBy(_ => _.index / 3, _ => _.item))
 {
+
+    @*
+    Filter & Group the Locations by the number of columns we want
+    Then we can iterate over each row
+    *@
+    
     <div class="row mb-2">
         @foreach (var location in row)
         {
-            <div class="col-md">
+            <div class="col-md mb-3">
                 <div class="container col  h-100">
                     <div class="card col  h-100" style="">
                         <div class="row g-0 h-100">
                             <div class="card-body h-100 d-flex flex-column">
                                 <div class="row">
                                     <div class="col-lg">
-                                        <h5 class="card-title">@location.Name</h5>
+                                        <h5 class="card-title"><i class="fa-solid fa-house"></i> @location.Name</h5>
                                     </div>
                                     <div class="col-lg">
                                         <p class="card-text text-left">
@@ -56,26 +52,37 @@
                                         </p>
                                     </div>
                                 </div>
-                                <div class="row mt-auto">
-                                    <div class="card-body justify-content-center d-flex flex-column align-items-center h-100">
+                                @*     <div class="row mt-auto"> *@
+                                <div class="justify-content-center d-flex flex-column align-items-center mt-auto pt-3">
 
-                                        <a asp-page="/Locations/Edit" asp-route-id="@location.Id" class="btn btn-primary @authDisplayUtility.CSSAuthDisabled mb-2 w-100 d-flex align-items-center justify-content-center">
-                                            @if (User?.Identity?.IsAuthenticated == false)
-                                            {
-                                                <i class="fa-solid fa-lock mr-2 ml-n2"></i>
-                                            }
-                                            <span>Edit</span>
-                                        </a>
+                                    <a asp-page="/Locations/Edit" asp-route-id="@location.Id" class="btn btn-primary @authDisplayUtility.CSSAuthDisabled mb-2 w-100 d-flex align-items-center justify-content-center">
+                                        @if (User?.Identity?.IsAuthenticated == false)
+                                        {
+                                            <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                                        }
+                                        <span>Edit</span>
+                                    </a>
 
-                                        <a asp-page="/Locations/Delete" asp-route-id="@location.Id" class="btn btn-danger @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center">
+                                    <form method="post" class=" w-100">
+                                        <button class="btn btn-danger @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center" asp-page="Delete" asp-route-id="@location.Id" type="submit">
                                             @if (User?.Identity?.IsAuthenticated == false)
                                             {
                                                 <i class="fa-solid fa-lock mr-2 ml-n2"></i>
                                             }
                                             <span>Delete</span>
-                                        </a>
-                                    </div>
+                                        </button>
+                                    </form>
+
+                                    @*       <a asp-page="/Locations/Delete" asp-page-handler="OnPostAsync" asp-route-id="@location.Id" class="btn btn-danger @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center">
+                            @if (User?.Identity?.IsAuthenticated == false)
+                            {
+                            <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                            }
+                            <span>Delete</span>
+                            </a> *@
+
                                 </div>
+                                @* </div> *@
 
                             </div>
                         </div>
@@ -86,13 +93,51 @@
 
         @if (row.Count() != 3)
         {
-            @for (var i = 0; i < 3 - (row.Count() % 3); i++)
+            <div class="col-md">
+                <div class="container col  h-100">
+                    <div class="card col  h-100 p-0">
+                        <a asp-page="Create" class="btn btn-light w-100 h-100 m-0  pt-5 pb-5 text-center align-items-center d-flex justify-content-center">
+                            <div class="d-flex flex-column ">
+                                <i class="fa-solid fa-plus"></i>
+                                <span class="mt-1">Add New</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            @for (var i = 0; i < 3 - (row.Count() % 3) - 1; i++)
             {
                 <div class="col-md">
                     &nbsp;
                 </div>
             }
 
+        }
+    </div>
+}
+
+@if (Model.Location.Count <= 0 || Model.Location.Count % 3 == 0)
+{
+    <div class="row mb-2">
+        <div class="col-md">
+            <div class="container col  h-100">
+                <div class="card col  h-100 p-0">
+                    <a asp-page="Create" class="btn btn-light w-100 h-100 m-0 pt-5 pb-5 text-center align-items-center d-flex justify-content-center">
+                        <div class="d-flex flex-column ">
+                            <i class="fa-solid fa-plus"></i>
+                            <span class="mt-1">Add New</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @for (var i = 0; i < 2; i++)
+        {
+            <div class="col-md">
+                &nbsp;
+            </div>
         }
     </div>
 }

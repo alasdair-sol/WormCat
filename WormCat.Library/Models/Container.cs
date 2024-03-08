@@ -14,5 +14,7 @@ namespace WormCat.Library.Models
         public virtual int LocationId { get; set; }
 
         public virtual Location? Location { get; set; }
+
+        public virtual List<Book>? Books { get; set; }
     }
 }

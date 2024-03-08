@@ -15,11 +15,11 @@ namespace WormCat.Razor.Pages.Containers
             _context = context;
         }
 
-        public IList<Container> Container { get;set; } = default!;
+        public IList<Container> Container { get; set; } = default!;
 
         public async Task OnGetAsync()
         {
-            Container = await _context.Container.ToListAsync();
+            Container = await _context.Container.Include(x => x.Location).ToListAsync();
         }
     }
 }

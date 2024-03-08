@@ -1,38 +1,135 @@
 ﻿@page
 @model WormCat.Razor.Pages.Containers.IndexModel
 
+@using WormCat.Library.Utility
+@inject IAuthDisplayUtility authDisplayUtility
+
 @{
     ViewData["Title"] = "Containers";
 }
 
-<h1>Containers</h1>
+@* Title bar *@
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <h2>Your Containers</h2>
+        </div>
+        <div class="col-sm-auto">
+            <a asp-page="Create" class="w-100 btn btn-primary d-md-none"><i class="fa-solid fa-plus"></i> Add New</a>
+        </div>
+    </div>
 
-<p>Containers differ from <a class="nav-link text-dark" asp-area="" asp-page="/Locations/Index">Locations</a> in that they are defined as a collection of books. The Location of this container can be moved without modifying the Container itself.</p>
+    <p>Containers are storage vessels where you can store an array of books. For example, you may have a primary bookshelf, and two boxes full of old books. Each container can be assigned to a location, and may be moved at will.</p>
+</div>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Container[0].Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Container) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+
+@* Main content *@
+@foreach (var row in Model.Container.Select((item, index) => new { item, index }).GroupBy(_ => _.index / 3, _ => _.item))
+{
+
+    @*
+    Filter & Group the Containers by the number of columns we want
+    Then we can iterate over each row
+*@
+
+    <div class="row mb-2 container">
+        @foreach (var container in row)
+        {
+            <div class="col-md">
+                <div class="card col  h-100" style="">
+
+
+                    <div class="row">
+                        <div class="card-body h-100 ">
+                            <h5 class="card-title"><i class="fa-solid fa-box-open"></i> @container.Name</h5>
+                            <p class="card-text">
+                                Available at @container.Location?.Name
+                                <br />
+                                <span class="text-muted">@container.Books?.Count() books in storage</span>
+                            </p>
+
+                            <div class="justify-content-center d-flex flex-column align-items-center">
+
+                                <a asp-page="Edit" asp-route-id="@container.Id" class="btn btn-primary @authDisplayUtility.CSSAuthDisabled mb-2 w-100 d-flex align-items-center justify-content-center">
+                                    @if (User?.Identity?.IsAuthenticated == false)
+                                    {
+                                        <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                                    }
+                                    <span>Edit</span>
+                                </a>
+
+                                <form method="post" class=" w-100">
+                                    <button class="btn btn-danger @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center" asp-page="Delete" asp-route-id="@container.Id" type="submit">
+                                        @if (User?.Identity?.IsAuthenticated == false)
+                                        {
+                                            <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                                        }
+                                        <span>Delete</span>
+                                    </button>
+                                </form>
+
+                                @* <a asp-page="Delete" asp-route-id="@container.Id" class="btn btn-danger @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center">
+                        @if (User?.Identity?.IsAuthenticated == false)
+                        {
+                        <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                        }
+                        <span>Delete</span>
+                        </a> *@
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (row.Count() != 3)
+        {
+            <div class="col-md">
+                <div class="container col  h-100">
+                    <div class="card col  h-100 p-0">
+                        <a asp-page="Create" class="btn btn-light w-100 h-100 m-0  pt-5 pb-5 text-center align-items-center d-flex justify-content-center">
+                            <div class="d-flex flex-column ">
+                                <i class="fa-solid fa-plus"></i>
+                                <span class="mt-1">Add New</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            @for (var i = 0; i < 3 - (row.Count() % 3) - 1; i++)
+            {
+                <div class="col-md">
+                    &nbsp;
+                </div>
+            }
+        }
+    </div>
 }
-    </tbody>
-</table>
+
+@if (Model.Container.Count <= 0 || Model.Container.Count % 3 == 0)
+{
+    <div class="row mb-2">
+        <div class="col-md">
+            <div class="container col  h-100">
+                <div class="card col  h-100 p-0">
+                    <a asp-page="Create" class="btn btn-light w-100 h-100 m-0  pt-5 pb-5 text-center align-items-center d-flex justify-content-center">
+                        <div class="d-flex flex-column ">
+                            <i class="fa-solid fa-plus"></i>
+                            <span class="mt-1">Add New</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @for (var i = 0; i < 2; i++)
+        {
+            <div class="col-md">
+                &nbsp;
+            </div>
+        }
+    </div>
+}

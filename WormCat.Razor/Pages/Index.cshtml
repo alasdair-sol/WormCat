@@ -5,9 +5,12 @@
 @{
     ViewData["Title"] = "Home page";
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="~/js/barcode-scanner/quagga.min.js"> </script>
+    // <script src="~/js/barcode-scanner/BarcodeScanner.js"> </script>
+
     @if (Model.action == "1")
     {
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 
         <script type="text/javascript">
             $(document).ready(function () {
@@ -15,7 +18,207 @@
             });
         </script>
     }
+
+    /*
+    <script type="module">
+    import QrScanner from '/js/qrScanner/qr-scanner-min.js';
+
+    const videoElem = document.getElementById("qrScannerVideo");
+    const qrScanner = new QrScanner(
+    videoElem,
+    result => { console.log("result"); },
+    {
+    returnDetailedScanResult: true,
+    // onDecodeError: (e) => { console.log("QR ERROR: "); console.log(e); }
+        }
+        )
+
+    QrScanner.hasCamera().then(function (result) {
+    // do something with result
+    console.log("Device has camera: " + result);
+
+    // qrScanner.start();
+            qrScanner.start();
+    })
+
+            </script>
+            */
+
+            /*
+                    <script src="~/js/barcode-scanner/quagga.min.js"> </script>
+    <script type="module">
+    // import Quagga from '/js/barcode-scanner/quagga.js';
+
+
+
+    console.log("Setup Barcode Scanner");
+
+    if (Quagga)
+    console.log("Quagga found");
+
+    Quagga.init({
+    inputStream: {
+    name: "Live",
+    type: "LiveStream",
+    target: document.querySelector('#interactive')    // Or '#yourElement' (optional)
+        },
+        decoder: {
+        readers: ["ean_reader", {
+        format: "ean_reader",
+        config: {
+        supplements: [
+    'ean_5_reader', 'ean_2_reader'
+    ]
+    }
+    }]
+    }
+    }, function (err) {
+    if (err) {
+    console.log(err);
+    return
+    }
+            console.log("Initialization finished. Ready to start");
+                    Quagga.start();
+                    });
+
+    Quagga.onDetected(function (result) {
+    var code = result.codeResult.code;
+
+
+    if (code !== null && code !== undefined) {
+            if (code.startsWith('97') == false) return;
+        if (code.length != 13) return;
+                console.log("Found EAN_8 barcode: " + code);
+
+    var div = document.createElement('div');
+    div.append(code);
+            document.getElementById("barcode-results").append(div);
+    }
+    });
+
+    </script>
+    */
+
+
+
+    <script>
+        let running = false;
+
+        function StartBarcodeScanner() {
+            console.log("Setup Barcode Scanner");
+
+
+            if (Quagga)
+                console.log("Quagga found");
+
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#interactive')    // Or '#yourElement' (optional)
+                },
+                decoder: {
+                    readers: ["ean_reader", {
+                        format: "ean_reader",
+                        config: {
+                            supplements: [
+                                'ean_5_reader', 'ean_2_reader'
+                            ]
+                        }
+                    }]
+                }
+            }, function (err) {
+                if (err) {
+                    console.log(err);
+
+                    $("#modalErrorPopup").modal("show");
+                    document.getElementById("modalErrorPopupBody").innerText = "Barcode scanner failed to start up.\n" + err;
+
+                    return
+                }
+                console.log("Initialization finished. Ready to start");
+
+                Quagga.start();
+                $("#modalBarcodeScanner").modal("show");
+            });
+
+            Quagga.onDetected(function (result) {
+                var code = result.codeResult.code;
+                console.log("StartBarcodeScanner: Dection Ran");
+
+
+                if (code !== null && code !== undefined) {
+                    if (code.startsWith('97') == false) return;
+                    if (code.length != 13) return;
+
+                    console.log("Found EAN_13 barcode: " + code);
+
+                    document.getElementById("searchbar").value = code;
+                    document.getElementById("searchbar-form").submit();
+                    // Quagga.stop();
+
+                }
+            });
+
+        }
+
+        /*
+        function StartBarcodeScannerOLD() {
+
+            console.log("Attempt StartBarcodeScanner");
+            if (running == true) return;
+
+            console.log("StartBarcodeScanner");
+
+            RunBarcodeScanner((err) => {
+                if (barcodeScannerReadyToUse == false || err) {
+                    $("#modalErrorPopup").modal("show");
+                    document.getElementById("modalErrorPopupBody").innerText = "Barcode scanner failed to start up.\n" + err;
+
+                    StopBarcodeScanner();
+                    return;
+                }
+
+                running = true;
+                $("#modalBarcodeScanner").modal("show");
+
+                console.log("StartBarcodeScanner: Running detection");
+
+                Quagga.onDetected(function (result) {
+                    var code = result.codeResult.code;
+                    console.log("StartBarcodeScanner: Dection Ran");
+
+
+                    if (code !== null && code !== undefined) {
+                        if (code.startsWith('97') == false) return;
+                        if (code.length != 13) return;
+
+                        console.log("Found EAN_13 barcode: " + code);
+
+                        document.getElementById("searchbar").value = code;
+                        document.getElementById("searchbar-form").submit();
+                        Quagga.stop();
+
+                    }
+                });
+            });
+        }
+        */
+
+        function StopBarcodeScanner() {
+            console.log("StopBarcodeScanner");
+            running = false;
+            Quagga.stop();
+        }
+    </script>
+
+    <script type="module">
+        function StartBarcodeScanner() { console.log("StartBarcodeScannerStartBarcodeScannerStartBarcodeScanner") }
+    </script>
+
 }
+
+
 
 <!-- Modal -->
 <div class="modal fade" id="modalDatabaseSeeded" tabindex="-1" aria-labelledby="modalDatabaseSeededLabel" aria-hidden="true">
@@ -34,73 +237,141 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalBarcodeScanner" tabindex="-1" aria-labelledby="modalBarcodeScannerLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalBarcodeScannerLabel">Barcode Scanner</h5>
+            </div>
+            <div class="viewport" id="interactive">
+                <video autoplay="true" preload="auto" id="qrScannerVideo" class="w-100 h-100"></video>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="StopBarcodeScanner()">Stop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalErrorPopup" tabindex="-1" aria-labelledby="modalErrorPopupLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalErrorPopupLabel">An error occurred</h5>
+            </div>
+            <div class="modal-body" id="modalErrorPopupBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @* Search Bar *@
 <div class="container">
     <div class="row">
         <div class="col-md-6">
             <h2>Your Collection</h2>
         </div>
-        <div class="col-md-2">
-            <a asp-page-handler="SeedDatabase" class="btn btn-primary w-100">Seed</a>
+        <div class="col-md-1">
+            <a asp-page-handler="SeedDatabase" class=" btn  btn-primary w-100">Seed</a>
+        </div>
+        <div class="col-md-1">
+            <button onclick="StartBarcodeScanner()" class="btn btn-primary">Scan</button>
         </div>
         <div class="col-md-4 d-flex align-items-center">
-            <form class="justify-content-center flex-grow-1">
-                <input placeholder="Search..." class="w-100" asp-for="query" />
+            <form class="justify-content-center flex-grow-1" id="searchbar-form">
+                <input placeholder="Search..." class="w-100" asp-for="query" id="searchbar" />
             </form>
         </div>
     </div>
 </div>
 
 @* Records View *@
-<div class="container pt-2">
-    @for (int i = 0; i < Model.Records.Count; i++)
+<div class="container">
+
+    @if (Model.Records.Count <= 0)
     {
-        <div class="row mb-2 ">
-            <div class="card col" style="">
-                <div class="row g-0">
-                    <div class="col-sm-2 text-center">
-                        <img src="data:image/jpg;base64, @RecordUtility.GetRecordBase64Image(Model.Records[i])" class="img-fluid rounded-start pt-2 pb-2" alt="..." style="max-height:10em">
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="card-body">
-                            <h5 class="card-title">@Model.Records[i].Title</h5>
-                            <p class="card-text">@Model.Records[i].Description</p>
-                            @if (RecordUtility.RecordHasAvailableCopy(Model.Records[i]))
-                            {
-                                @if (RecordUtility.GetRecordUniqueContainers(Model.Records[i]).Count() > 1)
+        if (string.IsNullOrWhiteSpace(Model.query) == false)
+        {
+            <p class="text-muted">No Results Found.</p>
+        }
+        else
+        {
+            <p class="text-muted">You haven't added any Records yet</p>
+        }
+    }
+
+    <div class="container pt-2">
+        @for (int i = 0; i < Model.Records.Count; i++)
+        {
+            <div class="row mb-2 ">
+                <div class="card col" style="">
+                    <div class="row g-0">
+                        <div class="col-sm-4 col-md-2 p-0 text-center align-items-center justify-content-center d-none d-sm-flex">
+                            <a asp-page="/Records/Details" asp-route-id="@Model.Records[i].Id">
+                                <img src="data:image/jpg;base64, @RecordUtility.GetRecordBase64Image(Model.Records[i])" class="img-fluid rounded-start" alt="...">
+                            </a>
+                        </div>
+                        <div class="col-sm-4 col-md-2 text-center align-items-center justify-content-center d-sm-none" style="max-height:10rem; overflow:hidden">
+                            <a asp-page="/Records/Details" asp-route-id="@Model.Records[i].Id">
+                                <img src="data:image/jpg;base64, @RecordUtility.GetRecordBase64Image(Model.Records[i])" class="img-fluid rounded-start" alt="...">
+                            </a>
+                        </div>
+                        <div class="col-sm-8 col-md-6">
+                            <div class="card-body">
+                                <h5 class="card-title">@Model.Records[i].Title</h5>
+                                <p class="card-text">
+                                    @Model.Records[i].Description.Substring(0, Math.Min(Model.Records[i].Description.Length, 250)) @if (Model.Records[i].Description.Length > 250)
+                                    {
+                                        <span><b>...</b></span>
+                                    }
+                                </p>
+                                @if (RecordUtility.RecordHasAvailableCopy(Model.Records[i]))
                                 {
-                                    <p class="card-text text-muted">
-                                        Available in [<a asp-page="/Containers/Details" asp-route-id="@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Id">@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Name</a>, and more..]
-                                    </p>
+                                    @if (RecordUtility.GetRecordUniqueContainers(Model.Records[i]).Count() > 1)
+                                    {
+                                        <p class="card-text text-muted">
+                                            Available in [<a asp-page="/Containers/Details" asp-route-id="@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Id">@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Name</a>, and more..]
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <p class="card-text text-muted">
+                                            Available in [<a asp-page="/Containers/Details" asp-route-id="@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Id">@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Name</a>]
+                                        </p>
+                                    }
                                 }
                                 else
                                 {
-                                    <p class="card-text text-muted">
-                                        Available in [<a asp-page="/Containers/Details" asp-route-id="@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Id">@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Name</a>]
-                                    </p>
+                                    <p class="card-text text-danger">Not available</p>
                                 }
-                            }
-                            else
-                            {
-                                <p class="card-text text-danger">Not available</p>
-                            }
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card-body justify-content-center d-flex flex-column align-items-center h-100">
-                            <a asp-page="/Records/Details" asp-route-id="@Model.Records[i].Id" class="btn btn-primary mb-2 w-100">View</a>
-                            <a asp-page="/Records/Edit" asp-route-id="@Model.Records[i].Id" class="btn btn-@authDisplayUtility.CSSAuthColour @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center">
-                                @if (User?.Identity?.IsAuthenticated == false)
-                                {
-                                    <i class="fa-solid fa-lock mr-2 ml-n2"></i>
-                                }
-                                <span>Edit</span>
-                            </a>
+                        <div class="col-md-4">
+                            <div class="mb-4 justify-content-center d-flex flex-column align-items-center h-100">
+                                <a asp-page="/Records/Details" asp-route-id="@Model.Records[i].Id" class="btn btn-primary mb-2 w-100">View</a>
+                                <a asp-page="/Records/Edit" asp-route-id="@Model.Records[i].Id" class="btn btn-primary @authDisplayUtility.CSSAuthDisabled  mb-2 w-100 d-flex align-items-center justify-content-center">
+                                    @if (User?.Identity?.IsAuthenticated == false)
+                                    {
+                                        <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                                    }
+                                    <span>Edit</span>
+                                </a>
+                                <a asp-page="/Records/Delete" asp-route-id="@Model.Records[i].Id" class="btn btn-@authDisplayUtility.CSSAuthColour @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center">
+                                    @if (User?.Identity?.IsAuthenticated == false)
+                                    {
+                                        <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                                    }
+                                    <span>Delete</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    }
+        }
 
+    </div>
 </div> 

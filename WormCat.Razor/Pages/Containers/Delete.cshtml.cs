@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using WormCat.Library.Models;
@@ -36,7 +37,7 @@ namespace WormCat.Razor.Pages.Containers
             }
             return Page();
         }
-
+            
         public async Task<IActionResult> OnPostAsync(int? id)
         {
             if (id == null)

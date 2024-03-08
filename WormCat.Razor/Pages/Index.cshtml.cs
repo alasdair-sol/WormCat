@@ -37,9 +37,17 @@ namespace WormCat.Razor.Pages
 
             if (string.IsNullOrWhiteSpace(query) == false)
             {
+                var isbnRecord = await _context.Record.Where(x => x.ISBN.ToString() == query).FirstOrDefaultAsync();
+
+                if (isbnRecord != null)
+                {
+                    // If the search query matches an existing barcode, redirect to view that copy specifically.
+                    return LocalRedirect($"/Records/Details?id={isbnRecord.Id}");
+                }
+
                 var book = await _context.Book.Where(x => x.Barcode == query).FirstOrDefaultAsync();
 
-                if(book != null)
+                if (book != null)
                 {
                     // If the search query matches an existing barcode, redirect to view that copy specifically.
                     return LocalRedirect($"/Books/Details?id={book.Id}");
