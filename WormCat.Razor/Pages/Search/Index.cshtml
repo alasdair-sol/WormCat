@@ -1,66 +1,12 @@
 ﻿@page
+
 @using WormCat.Library.Utility
 @inject IAuthDisplayUtility authDisplayUtility;
-@model IndexModel
+
+@model WormCat.Razor.Pages.Search.IndexModel
 @{
-    ViewData["Title"] = "Home page";
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    <script src="~/js/barcode-scanner/quagga.min.js"> </script>
-    // <script src="~/js/barcode-scanner/BarcodeScanner.js"> </script>
-
-    @if (Model.action == "1")
-    {
-
-        <script type="text/javascript">
-            $(document).ready(function () {
-                $("#modalDatabaseSeeded").modal("show");
-            });
-        </script>
-    }
-
-
-
+    ViewData["Title"] = "Search";
 }
-
-
-
-<!-- Modal -->
-<div class="modal fade" id="modalDatabaseSeeded" tabindex="-1" aria-labelledby="modalDatabaseSeededLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalDatabaseSeededLabel">Database Seeded</h5>
-            </div>
-            <div class="modal-body">
-                The WormCat database has been successfully seeded.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Okay</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-@* Search Bar *@
-<div class="container">
-    <div class="row">
-        <div class="col-auto">
-            <h2>Your Collection</h2>
-        </div>
-        <div class="col-auto ml-auto">
-            <a asp-page-handler="SeedDatabase" class=" btn  btn-primary w-100">Seed</a>
-        </div>
-@*         <div class="col-md-1">
-            <button onclick="StartBarcodeScanner()" class="btn btn-primary">Scan</button>
-        </div> *@
-@*         <div class="col-md-4 d-flex align-items-center">
-             <form class="justify-content-center flex-grow-1" id="searchbar-form">
-                 <input placeholder="Search..." class="w-100" asp-for="query" id="searchbar" />
-             </form>
-        </div> *@
-    </div>
-</div>
 
 @* Records View *@
 <div class="container">
@@ -148,4 +94,4 @@
         }
 
     </div>
-</div> 
+</div>

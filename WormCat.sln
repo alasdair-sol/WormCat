@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WormCat.Library", "WormCat.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WormCat.Razor", "WormCat.Razor\WormCat.Razor.csproj", "{858FAD37-D589-4218-9A28-7B89AD74D57F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WormCat.Data", "WormCat.Data\WormCat.Data.csproj", "{7EE9358A-B3A7-473D-9177-56835F2375C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WormCat.Data", "WormCat.Data\WormCat.Data.csproj", "{7EE9358A-B3A7-473D-9177-56835F2375C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
