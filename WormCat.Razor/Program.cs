@@ -85,7 +85,12 @@ static void ConfigureIdentity(ConfigurationManager configuration, IServiceCollec
         options.Password.RequireDigit = false;
     });
 
-    services.AddAuthentication();
+    services.AddAuthentication().AddGoogle(opt =>
+    {
+        opt.ClientId = configuration["Authentication:Google:ClientId"];
+        opt.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+    });
+
     services.AddAuthorization(options =>
     {
         /*options.FallbackPolicy = new AuthorizationPolicyBuilder()
