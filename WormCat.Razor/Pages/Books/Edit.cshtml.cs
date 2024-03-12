@@ -77,7 +77,7 @@ namespace WormCat.Razor.Pages.Books
                 }
             }
 
-            return Redirect($"/Books/Details/{Book.Id}");
+            return LocalRedirect($"/Records/Details?id={Book.RecordId}");
         }
 
         private bool BookExists(int id)

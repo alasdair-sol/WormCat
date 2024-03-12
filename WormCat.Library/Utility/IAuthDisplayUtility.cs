@@ -12,5 +12,7 @@ namespace WormCat.Library.Utility
         ClaimsPrincipal? User { get; }
         IIdentity? Identity { get; }
         bool IsAuthenticated { get; }
+
+        string GetOAuthDisplayIcon(string idp);
     }
 }

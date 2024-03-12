@@ -33,7 +33,7 @@ namespace WormCat.Razor.Pages
         {
             _logger.LogInformation("OnGetAsync");
 
-            Records = await _context.Record.Include(x => x.Books).ThenInclude(x => x.Container).ThenInclude(x => x.Location).ToListAsync();
+            Records = await _context.Record.Include(x => x.Books).ThenInclude(x => x.Container).ThenInclude(x => x.Location).OrderBy(x=>x.Title).ToListAsync();
 
             if (string.IsNullOrWhiteSpace(query) == false)
             {

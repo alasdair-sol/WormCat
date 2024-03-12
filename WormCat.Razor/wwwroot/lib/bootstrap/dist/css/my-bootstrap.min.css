@@ -15,7 +15,7 @@
     --gray: #888;
     --gray-dark: #343a40;
     --primary: #78C2AD;
-    --secondary: #F3969A;
+    --secondary: #D3BE91;
     --success: #56CC9D;
     --info: #6CC3D5;
     --warning: #FFCE67;
@@ -1715,19 +1715,19 @@ pre {
     }
 
 .table-secondary, .table-secondary > td, .table-secondary > th {
-    background-color: #fce2e3
+    background-color: #f3ede0
 }
 
     .table-secondary tbody + tbody, .table-secondary td, .table-secondary th, .table-secondary thead th {
-        border-color: #f9c8ca
+        border-color: #e8ddc6
     }
 
 .table-hover .table-secondary:hover {
-    background-color: #facbcd
+    background-color: #ece2ce
 }
 
     .table-hover .table-secondary:hover > td, .table-hover .table-secondary:hover > th {
-        background-color: #facbcd
+        background-color: #ece2ce
     }
 
 .table-success, .table-success > td, .table-success > th {
@@ -2438,6 +2438,7 @@ a.btn.disabled, fieldset:disabled a.btn {
     }
 
     .btn-primary.disabled, .btn-primary:disabled {
+        color: #212529;
         background-color: #78c2ad;
         border-color: #78c2ad
     }
@@ -2454,37 +2455,37 @@ a.btn.disabled, fieldset:disabled a.btn {
 
 .btn-secondary {
     color: #212529;
-    background-color: #f3969a;
-    border-color: #f3969a
+    background-color: #d3be91;
+    border-color: #d3be91
 }
 
     .btn-secondary:hover {
         color: #212529;
-        background-color: #ef7479;
-        border-color: #ee686e
+        background-color: #c8ae76;
+        border-color: #c4a86d
     }
 
     .btn-secondary.focus, .btn-secondary:focus {
         color: #212529;
-        background-color: #ef7479;
-        border-color: #ee686e;
-        box-shadow: 0 0 0 .2rem rgba(212,133,137,.5)
+        background-color: #c8ae76;
+        border-color: #c4a86d;
+        box-shadow: 0 0 0 .2rem rgba(184,167,129,.5)
     }
 
     .btn-secondary.disabled, .btn-secondary:disabled {
         color: #212529;
-        background-color: #f3969a;
-        border-color: #f3969a
+        background-color: #d3be91;
+        border-color: #d3be91
     }
 
     .btn-secondary:not(:disabled):not(.disabled).active, .btn-secondary:not(:disabled):not(.disabled):active, .show > .btn-secondary.dropdown-toggle {
-        color: #fff;
-        background-color: #ee686e;
-        border-color: #ec5d63
+        color: #212529;
+        background-color: #c4a86d;
+        border-color: #c1a363
     }
 
         .btn-secondary:not(:disabled):not(.disabled).active:focus, .btn-secondary:not(:disabled):not(.disabled):active:focus, .show > .btn-secondary.dropdown-toggle:focus {
-            box-shadow: 0 0 0 .2rem rgba(212,133,137,.5)
+            box-shadow: 0 0 0 .2rem rgba(184,167,129,.5)
         }
 
 .btn-success {
@@ -2612,6 +2613,7 @@ a.btn.disabled, fieldset:disabled a.btn {
     }
 
     .btn-danger.disabled, .btn-danger:disabled {
+        color: #212529;
         background-color: #ff7851;
         border-color: #ff7851
     }
@@ -2727,33 +2729,33 @@ a.btn.disabled, fieldset:disabled a.btn {
         }
 
 .btn-outline-secondary {
-    color: #f3969a;
-    border-color: #f3969a
+    color: #d3be91;
+    border-color: #d3be91
 }
 
     .btn-outline-secondary:hover {
         color: #212529;
-        background-color: #f3969a;
-        border-color: #f3969a
+        background-color: #d3be91;
+        border-color: #d3be91
     }
 
     .btn-outline-secondary.focus, .btn-outline-secondary:focus {
-        box-shadow: 0 0 0 .2rem rgba(243,150,154,.5)
+        box-shadow: 0 0 0 .2rem rgba(211,190,145,.5)
     }
 
     .btn-outline-secondary.disabled, .btn-outline-secondary:disabled {
-        color: #f3969a;
+        color: #d3be91;
         background-color: transparent
     }
 
     .btn-outline-secondary:not(:disabled):not(.disabled).active, .btn-outline-secondary:not(:disabled):not(.disabled):active, .show > .btn-outline-secondary.dropdown-toggle {
         color: #212529;
-        background-color: #f3969a;
-        border-color: #f3969a
+        background-color: #d3be91;
+        border-color: #d3be91
     }
 
         .btn-outline-secondary:not(:disabled):not(.disabled).active:focus, .btn-outline-secondary:not(:disabled):not(.disabled):active:focus, .show > .btn-outline-secondary.dropdown-toggle:focus {
-            box-shadow: 0 0 0 .2rem rgba(243,150,154,.5)
+            box-shadow: 0 0 0 .2rem rgba(211,190,145,.5)
         }
 
 .btn-outline-success {
@@ -3229,7 +3231,7 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
     .dropdown-item:focus, .dropdown-item:hover {
         color: #fff;
         text-decoration: none;
-        background-color: #f3969a
+        background-color: #d3be91
     }
 
     .dropdown-item.active, .dropdown-item:active {
@@ -4807,17 +4809,17 @@ a.badge-primary.focus, a.badge-primary:focus {
 
 .badge-secondary {
     color: #212529;
-    background-color: #f3969a
+    background-color: #d3be91
 }
 
 a.badge-secondary:focus, a.badge-secondary:hover {
     color: #212529;
-    background-color: #ee686e
+    background-color: #c4a86d
 }
 
 a.badge-secondary.focus, a.badge-secondary:focus {
     outline: 0;
-    box-shadow: 0 0 0 .2rem rgba(243,150,154,.5)
+    box-shadow: 0 0 0 .2rem rgba(211,190,145,.5)
 }
 
 .badge-success {
@@ -4972,17 +4974,17 @@ a.badge-dark.focus, a.badge-dark:focus {
     }
 
 .alert-secondary {
-    color: #7e4e50;
-    background-color: #fdeaeb;
-    border-color: #fce2e3
+    color: #6e634b;
+    background-color: #f6f2e9;
+    border-color: #f3ede0
 }
 
     .alert-secondary hr {
-        border-top-color: #facbcd
+        border-top-color: #ece2ce
     }
 
     .alert-secondary .alert-link {
-        color: #5f3b3c
+        color: #504836
     }
 
 .alert-success {
@@ -5374,19 +5376,19 @@ a.badge-dark.focus, a.badge-dark:focus {
     }
 
 .list-group-item-secondary {
-    color: #7e4e50;
-    background-color: #fce2e3
+    color: #6e634b;
+    background-color: #f3ede0
 }
 
     .list-group-item-secondary.list-group-item-action:focus, .list-group-item-secondary.list-group-item-action:hover {
-        color: #7e4e50;
-        background-color: #facbcd
+        color: #6e634b;
+        background-color: #ece2ce
     }
 
     .list-group-item-secondary.list-group-item-action.active {
         color: #fff;
-        background-color: #7e4e50;
-        border-color: #7e4e50
+        background-color: #6e634b;
+        border-color: #6e634b
     }
 
 .list-group-item-success {
@@ -6301,11 +6303,11 @@ a.bg-primary:focus, a.bg-primary:hover, button.bg-primary:focus, button.bg-prima
 }
 
 .bg-secondary {
-    background-color: #f3969a !important
+    background-color: #d3be91 !important
 }
 
 a.bg-secondary:focus, a.bg-secondary:hover, button.bg-secondary:focus, button.bg-secondary:hover {
-    background-color: #ee686e !important
+    background-color: #c4a86d !important
 }
 
 .bg-success {
@@ -6409,7 +6411,7 @@ a.bg-dark:focus, a.bg-dark:hover, button.bg-dark:focus, button.bg-dark:hover {
 }
 
 .border-secondary {
-    border-color: #f3969a !important
+    border-color: #d3be91 !important
 }
 
 .border-success {
@@ -9635,11 +9637,11 @@ a.text-primary:focus, a.text-primary:hover {
 }
 
 .text-secondary {
-    color: #f3969a !important
+    color: #d3be91 !important
 }
 
 a.text-secondary:focus, a.text-secondary:hover {
-    color: #eb5158 !important
+    color: #bd9e5a !important
 }
 
 .text-success {
@@ -9821,11 +9823,11 @@ a.text-dark:focus, a.text-dark:hover {
 }
 
 .bg-dark {
-    background-color: #f3969a !important
+    background-color: #d3be91 !important
 }
 
 .border-dark {
-    border-color: #f3969a !important
+    border-color: #d3be91 !important
 }
 
 .btn, .btn:hover {
@@ -9849,7 +9851,7 @@ a.text-dark:focus, a.text-dark:hover {
 }
 
 .btn-outline-secondary {
-    color: #f3969a
+    color: #d3be91
 }
 
 .btn-outline-success {
@@ -9885,7 +9887,7 @@ a.text-dark:focus, a.text-dark:hover {
     }
 
     .table-secondary, .table-secondary > td, .table-secondary > th {
-        background-color: #f3969a
+        background-color: #d3be91
     }
 
 .table-light, .table-light > td, .table-light > th {
@@ -9921,7 +9923,7 @@ a.text-dark:focus, a.text-dark:hover {
 }
 
 .table-hover .table-secondary:hover, .table-hover .table-secondary:hover > td, .table-hover .table-secondary:hover > th {
-    background-color: #f07f84
+    background-color: #ccb37f
 }
 
 .table-hover .table-light:hover, .table-hover .table-light:hover > td, .table-hover .table-light:hover > th {
@@ -9987,7 +9989,7 @@ a.text-dark:focus, a.text-dark:hover {
 }
 
 .alert-secondary, .alert-secondary > td, .alert-secondary > th {
-    background-color: #f3969a
+    background-color: #d3be91
 }
 
 .alert-success, .alert-success > td, .alert-success > th {

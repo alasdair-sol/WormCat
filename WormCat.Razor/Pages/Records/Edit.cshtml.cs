@@ -60,7 +60,7 @@ namespace WormCat.Razor.Pages.Records
                 }
             }
 
-            return RedirectToPage("./Index");
+            return LocalRedirect($"/Records/Details?id={Record.Id}");
         }
 
         private bool RecordExists(int id)

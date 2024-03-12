@@ -52,7 +52,8 @@ namespace WormCat.Razor.Pages.Books
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToPage("./Index");
+            return LocalRedirect($"/Records/Details?id={Book.RecordId}");
+
         }
     }
 }

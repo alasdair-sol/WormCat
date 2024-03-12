@@ -8,10 +8,12 @@ namespace WormCat.Razor.Pages.Records
     public class DeleteModel : PageModel
     {
         private readonly WormCat.Data.Data.WormCatRazorContext _context;
+        private readonly ILogger<DeleteModel> _logger;
 
-        public DeleteModel(WormCat.Data.Data.WormCatRazorContext context)
+        public DeleteModel(WormCat.Data.Data.WormCatRazorContext context, ILogger<DeleteModel> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [BindProperty]
@@ -51,8 +53,9 @@ namespace WormCat.Razor.Pages.Records
                 _context.Record.Remove(Record);
                 await _context.SaveChangesAsync();
             }
-
-            return RedirectToPage("./Index");
+            _logger.LogInformation(HttpContext.Request.Path);
+            _logger.LogInformation(HttpContext.Request.PathBase);
+            return RedirectToPage("/Index");
         }
     }
 }

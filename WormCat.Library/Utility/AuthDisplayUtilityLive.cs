@@ -23,5 +23,15 @@ namespace WormCat.Library.Utility
         public string CSSAuthColour => IsAuthenticated == false ? "danger" : "primary";
         public string CSSAuthDisabled => IsAuthenticated == false ? "disabled" : string.Empty;
 
+        public string GetOAuthDisplayIcon(string idp)
+        {
+            switch (idp)
+            {
+                case "Google":
+                    return "<i class=\"fa-brands fa-google\"></i>";
+
+                default: return string.Empty;
+            }
+        }
     }
 }

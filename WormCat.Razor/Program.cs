@@ -7,6 +7,11 @@ using WormCat.Library.Utility;
 using Microsoft.AspNetCore.Authorization;
 
 var builder = CreateBuilder(args);
+/*var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
+
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();*/
 
 ConfigureServices(builder.Configuration, builder.Services);
 ConfigureIdentity(builder.Configuration, builder.Services);
@@ -53,7 +58,7 @@ static WebApplicationBuilder CreateBuilder(string[] args)
 }
 
 static void ConfigureServices(IConfigurationManager config, IServiceCollection services)
-{
+{    
     // Add services to the container.
     var defaultConnectionString = config.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
     var wormCatConnectionString = config.GetConnectionString("WormCatRazorContext") ?? throw new InvalidOperationException("Connection string 'WormCatRazorContext' not found.");
@@ -69,6 +74,9 @@ static void ConfigureServices(IConfigurationManager config, IServiceCollection s
 
     services.AddSingleton<IAuthDisplayUtility, AuthDisplayUtilityDev>();
     services.AddSingleton<IGenericUtility, GenericUtility>();
+    services.AddSingleton<IRecordUtility, RecordUtility>();
+
+    services.AddSingleton<IEnrichedContentProvider, EnrichedContentProviderGoogle>();
 
     services.AddScoped<SeedDatabase>();
     services.AddRazorPages();

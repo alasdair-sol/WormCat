@@ -74,7 +74,7 @@ namespace WormCat.Razor.Pages.Books
             _context.Book.Add(Book);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+            return LocalRedirect($"/Records/Details?id={Book.RecordId}");
         }
 
         private void PopulateSelectLists()

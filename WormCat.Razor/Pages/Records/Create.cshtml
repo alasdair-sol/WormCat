@@ -1,8 +1,36 @@
 ﻿@page
 @model WormCat.Razor.Pages.Records.CreateModel
 
+@using WormCat.Library.Utility
+@inject IRecordUtility recordUtility;
+
 @{
     ViewData["Title"] = "Create";
+
+    var enrichedISBNToken = Guid.NewGuid().ToString();
+    var modelImageBase64 = Guid.NewGuid().ToString();
+
+    // This little script dynamically grabs the value of the ISBN record input
+    // And replaces the following "Fetch Enriched Data" link with it's value
+        <script>
+
+            document.addEventListener("DOMContentLoaded", () => {
+                var hrefFetchEnrichedData = document.getElementById("hrefFetchEnrichedData");
+                var originalHref = hrefFetchEnrichedData.href;
+                hrefFetchEnrichedData.onclick = function (e) {
+                    //get the value from the other input and replace the link's href
+                    //before it's visited by the link click.
+                    var searchTextElement = document.getElementById("inputRecordISBN");
+                    e.target.href = originalHref.replace("@enrichedISBNToken", searchTextElement.value);
+                };
+
+                var inputRecordImageValue = document.getElementById("inputRecordImage").value;
+                document.getElementById("inputRecordImage").onselectionchange = function (e) {
+                    console.log(e);
+                }
+            });
+
+        </script>
 }
 
 <h1>Create</h1>
@@ -10,27 +38,46 @@
 <h4>Record</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-3">
+        <img src="data:image/jpg;base64, @Model.Record.Image" class="img-fluid rounded-start" alt="...">
+    </div>
+    <div class="col-md-9">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Record.ISBN" class="control-label"></label>
+                <input id="inputRecordISBN" asp-for="Record.ISBN" class="form-control" />
+                <a id="hrefFetchEnrichedData" asp-page="Create" asp-page-handler="CreateFromContentProvider" asp-route-query="@enrichedISBNToken">Fetch enriched data?</a>
+                <span asp-validation-for="Record.ISBN" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="Record.Title" class="control-label"></label>
                 <input asp-for="Record.Title" class="form-control" />
                 <span asp-validation-for="Record.Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Record.Description" class="control-label"></label>
-                <input asp-for="Record.Description" class="form-control" />
-                <span asp-validation-for="Record.Description" class="text-danger"></span>
+                <label asp-for="Record.Author" class="control-label"></label>
+                <input asp-for="Record.Author" class="form-control" />
+                <span asp-validation-for="Record.Author" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Record.ISBN" class="control-label"></label>
-                <input asp-for="Record.ISBN" class="form-control" />
-                <span asp-validation-for="Record.ISBN" class="text-danger"></span>
+                <label asp-for="Record.PublicationDate" class="control-label"></label>
+                <input asp-for="Record.PublicationDate" class="form-control" />
+                <span asp-validation-for="Record.PublicationDate" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="Record.PageCount" class="control-label"></label>
+                <input asp-for="Record.PageCount" class="form-control" />
+                <span asp-validation-for="Record.PageCount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Record.Synopsis" class="control-label"></label>
+                <textarea asp-for="Record.Synopsis" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Record.Synopsis" class="text-danger"></span>
+            </div>
+            <div class="form-group hidden">
                 <label asp-for="Record.Image" class="control-label"></label>
-                <input asp-for="Record.Image" class="form-control" />
+                <input id="inputRecordImage" asp-for="Record.Image" class="form-control" />
                 <span asp-validation-for="Record.Image" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -38,6 +85,7 @@
             </div>
         </form>
     </div>
+
 </div>
 
 <div>
@@ -45,5 +93,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

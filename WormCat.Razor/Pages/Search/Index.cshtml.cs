@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using WormCat.Library.Models;
+using WormCat.Library.Utility;
 using WormCat.Razor.Models;
 
 namespace WormCat.Razor.Pages.Search
@@ -12,16 +13,18 @@ namespace WormCat.Razor.Pages.Search
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly WormCat.Data.Data.WormCatRazorContext _context;
+        private readonly IRecordUtility _recordUtility;
 
         public IList<Record> Records { get; set; } = new List<Record>();
 
         [BindProperty(SupportsGet = true)]
         public string? query { get; set; } = string.Empty;
 
-        public IndexModel(ILogger<IndexModel> logger, WormCat.Data.Data.WormCatRazorContext context, SeedDatabase seedDatabase)
+        public IndexModel(ILogger<IndexModel> logger, WormCat.Data.Data.WormCatRazorContext context, IRecordUtility recordUtility)
         {
             _logger = logger;
             _context = context;
+            _recordUtility = recordUtility;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -32,12 +35,19 @@ namespace WormCat.Razor.Pages.Search
 
             if (string.IsNullOrWhiteSpace(query) == false)
             {
-                var isbnRecord = await _context.Record.Where(x => x.ISBN.ToString() == query).FirstOrDefaultAsync();
-
-                if (isbnRecord != null)
+                if (_recordUtility.IsISBN(query, out string isbn))
                 {
-                    // If the search query matches an existing barcode, redirect to view that copy specifically.
-                    return LocalRedirect($"/Records/Details?id={isbnRecord.Id}");
+                    var isbnRecord = await _context.Record.Where(x => x.ISBN.ToString() == query).FirstOrDefaultAsync();
+
+                    if (isbnRecord != null)
+                    {
+                        // If the search query matches an existing barcode, redirect to view that copy specifically.
+                        return LocalRedirect($"/Records/Details?id={isbnRecord.Id}");
+                    }
+                    else
+                    {
+                        return LocalRedirect($"/Records/Create?query={isbn}&handler=CreateFromContentProvider");
+                    }
                 }
 
                 var book = await _context.Book.Where(x => x.Barcode == query).FirstOrDefaultAsync();

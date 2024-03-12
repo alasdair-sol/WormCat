@@ -1,9 +1,10 @@
 ﻿@page
+@model WormCat.Razor.Pages.Search.IndexModel
 
 @using WormCat.Library.Utility
 @inject IAuthDisplayUtility authDisplayUtility;
+@inject IRecordUtility recordUtility;
 
-@model WormCat.Razor.Pages.Search.IndexModel
 @{
     ViewData["Title"] = "Search";
 }
@@ -15,11 +16,11 @@
     {
         if (string.IsNullOrWhiteSpace(Model.query) == false)
         {
-            <p class="text-muted">No Results Found.</p>
+            <p class="text-muted">No Results Found. <a asp-page="/Records/Create" asp-page-handler="CreateFromSearchQuery" asp-route-query="@Model.query">Add a new record?</a></p>
         }
         else
         {
-            <p class="text-muted">You haven't added any Records yet</p>
+            <p class="text-muted">You haven't added any Records yet. <a asp-page="/Records/Create" asp-route-fromSearchQuery="@Model.query">Add a new record?</a></p>
         }
     }
 
@@ -31,35 +32,35 @@
                     <div class="row g-0">
                         <div class="col-sm-4 col-md-2 p-md-0 pr-sm-0 text-center align-items-center justify-content-center d-none d-sm-flex">
                             <a asp-page="/Records/Details" asp-route-id="@Model.Records[i].Id">
-                                <img src="data:image/jpg;base64, @RecordUtility.GetRecordBase64Image(Model.Records[i])" class="img-fluid rounded-start" alt="...">
+                                <img src="data:image/jpg;base64, @recordUtility.GetRecordBase64Image(Model.Records[i])" class="img-fluid rounded-start" alt="...">
                             </a>
                         </div>
                         <div class="col-sm-4 col-md-2 pl-0 pr-0  text-center align-items-center justify-content-center d-sm-none" style="max-height:10rem; overflow:hidden">
                             <a asp-page="/Records/Details" asp-route-id="@Model.Records[i].Id">
-                                <img src="data:image/jpg;base64, @RecordUtility.GetRecordBase64Image(Model.Records[i])" class="img-fluid rounded-start" alt="...">
+                                <img src="data:image/jpg;base64, @recordUtility.GetRecordBase64Image(Model.Records[i])" class="img-fluid rounded-start" alt="...">
                             </a>
                         </div>
                         <div class="col-sm-8 col-md-6 pl-sm-0">
                             <div class="card-body">
                                 <h5 class="card-title">@Model.Records[i].Title</h5>
                                 <p class="card-text">
-                                    @Model.Records[i].Description.Substring(0, Math.Min(Model.Records[i].Description.Length, 250)) @if (Model.Records[i].Description.Length > 250)
+                                    @Model.Records[i].Synopsis.Substring(0, Math.Min(Model.Records[i].Synopsis.Length, 250)) @if (Model.Records[i].Synopsis.Length > 250)
                                     {
                                         <span><b>...</b></span>
                                     }
                                 </p>
-                                @if (RecordUtility.RecordHasAvailableCopy(Model.Records[i]))
+                                @if (recordUtility.RecordHasAvailableCopy(Model.Records[i]))
                                 {
-                                    @if (RecordUtility.GetRecordUniqueContainers(Model.Records[i]).Count() > 1)
+                                    @if (recordUtility.GetRecordUniqueContainers(Model.Records[i]).Count() > 1)
                                     {
                                         <p class="card-text text-muted">
-                                            Available in [<a asp-page="/Containers/Details" asp-route-id="@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Id">@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Name</a>, and more..]
+                                            Available in [<a asp-page="/Containers/Details" asp-route-id="@recordUtility.GetRecordFirstContainer(Model.Records[i]).Id">@recordUtility.GetRecordFirstContainer(Model.Records[i]).Name</a>, and more..]
                                         </p>
                                     }
                                     else
                                     {
                                         <p class="card-text text-muted">
-                                            Available in [<a asp-page="/Containers/Details" asp-route-id="@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Id">@RecordUtility.GetRecordFirstContainer(Model.Records[i]).Name</a>]
+                                            Available in [<a asp-page="/Containers/Details" asp-route-id="@recordUtility.GetRecordFirstContainer(Model.Records[i]).Id">@recordUtility.GetRecordFirstContainer(Model.Records[i]).Name</a>]
                                         </p>
                                     }
                                 }
@@ -72,20 +73,22 @@
                         <div class="col-md-4 d-flex align-content-center">
                             <div class="mb-4 justify-content-center d-flex flex-column align-items-center h-auto w-100">
                                 <a asp-page="/Records/Details" asp-route-id="@Model.Records[i].Id" class="btn btn-primary mb-2 w-100">View</a>
-                                <a asp-page="/Records/Edit" asp-route-id="@Model.Records[i].Id" class="btn btn-primary @authDisplayUtility.CSSAuthDisabled  mb-2 w-100 d-flex align-items-center justify-content-center">
+                                <a asp-page="/Records/Edit" asp-route-id="@Model.Records[i].Id" class="btn btn-secondary @authDisplayUtility.CSSAuthDisabled  mb-2 w-100 d-flex align-items-center justify-content-center">
                                     @if (User?.Identity?.IsAuthenticated == false)
                                     {
                                         <i class="fa-solid fa-lock mr-2 ml-n2"></i>
                                     }
                                     <span>Edit</span>
-                                </a>
-                                <a asp-page="/Records/Delete" asp-route-id="@Model.Records[i].Id" class="btn btn-@authDisplayUtility.CSSAuthColour @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center">
-                                    @if (User?.Identity?.IsAuthenticated == false)
-                                    {
-                                        <i class="fa-solid fa-lock mr-2 ml-n2"></i>
-                                    }
-                                    <span>Delete</span>
-                                </a>
+                                </a>    
+                                <form method="post" asp-page="/Records/Delete" asp-route-id="@Model.Records[i].Id" class="w-100">
+                                    <button type="submit" class="btn btn-secondary @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center" value="Delete">
+                                        @if (User?.Identity?.IsAuthenticated == false)
+                                        {
+                                            <i class="fa-solid fa-lock mr-2 ml-n2"></i>
+                                        }
+                                        <span>Delete</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>

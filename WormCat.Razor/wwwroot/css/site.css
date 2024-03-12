@@ -34,3 +34,12 @@ body {
 .hidden{
     display:none !important;
 }
+
+hr.emphasis {
+    border-top: 1px solid rgba(0,0,0,.25)
+}
+
+.link-unstyled, .link-unstyled:link, .link-unstyled:hover {
+    color: inherit;
+    text-decoration: inherit;
+}

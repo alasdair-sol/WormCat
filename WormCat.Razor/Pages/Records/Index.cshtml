@@ -17,14 +17,12 @@
                 @Html.DisplayNameFor(model => model.Records[0].Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Records[0].Description)
+                @Html.DisplayNameFor(model => model.Records[0].Synopsis)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Records[0].ISBN)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Records[0].Image)
-            </th>
+
             <th></th>
         </tr>
     </thead>
@@ -35,14 +33,12 @@
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Description)
+                @Html.DisplayFor(modelItem => item.Synopsis)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ISBN)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Image)
-            </td>
+
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
