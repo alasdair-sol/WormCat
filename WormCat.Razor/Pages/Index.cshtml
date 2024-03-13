@@ -19,9 +19,16 @@
             });
         </script>
     }
+
+    // Auto submit sort form when dropdown value changes
+    <script>    
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("selectSort").addEventListener("change", (e) => {
+                document.getElementById("formSort").submit();
+            });
+        });
+    </script>
 }
-
-
 
 <!-- Modal -->
 <div class="modal fade" id="modalDatabaseSeeded" tabindex="-1" aria-labelledby="modalDatabaseSeededLabel" aria-hidden="true">
@@ -40,14 +47,18 @@
     </div>
 </div>
 
-@* Search Bar *@
+@* Header Bar *@
 <div class="container">
     <div class="row">
         <div class="col-auto">
             <h2>Your Collection</h2>
         </div>
+
         <div class="col-auto ml-auto">
-            <a asp-page-handler="SeedDatabase" class=" btn  btn-primary w-100">Seed</a>
+            <form method="get" id="formSort" class="d-flex flex-display-row align-items-end mb-0">
+                <label class="control-label mr-3">Sort</label>
+                <select id="selectSort" asp-for="@Model.Sort" class="form-control" asp-items="@Model.SortOptions"></select>
+            </form>
         </div>
     </div>
 </div>
@@ -77,8 +88,17 @@
                             </a>
                         </div>
                         <div class="col-sm-8 col-md-6 pl-sm-0">
-                            <div class="card-body">
-                                <h5 class="card-title"><a asp-page="/Records/Details" asp-route-id="@Model.Records[i].Id" class="link-unstyled">@Model.Records[i].Title</a></h5>
+                            <div class="card-body pl-0 pr-0 pr-sm-3 pl-sm-3">
+                                <h5 class="card-title">
+                                    <a asp-page="/Records/Details" asp-route-id="@Model.Records[i].Id" class="text-secondary link-unstyled-col">
+                                        <div class="row w-100 m-0">
+                                            @Model.Records[i].Title
+                                        </div>
+                                        <div class="row w-100 m-0">
+                                            <h6 class="d-inline text-muted">by @Model.Records[i].Author</h6>
+                                        </div>
+                                    </a>
+                                </h5>
                                 <p class="card-text">
                                     @Model.Records[i].Synopsis.Substring(0, Math.Min(Model.Records[i].Synopsis.Length, 250)) @if (Model.Records[i].Synopsis.Length > 250)
                                     {
@@ -106,8 +126,8 @@
                                 }
                             </div>
                         </div>
-                        <div class="col-md-4 d-flex align-content-center">
-                            <div class="mb-4 justify-content-center d-flex flex-column align-items-center h-auto w-100">
+                        <div class="col-md-4 mb-3 mt-3 d-flex align-content-center">
+                            <div class="justify-content-center d-flex flex-column align-items-center h-auto w-100">
                                 <a asp-page="/Records/Details" asp-route-id="@Model.Records[i].Id" class="btn btn-primary mb-2 w-100">View</a>
                                 <a asp-page="/Records/Edit" asp-route-id="@Model.Records[i].Id" class="btn btn-secondary @authDisplayUtility.CSSAuthDisabled  mb-2 w-100 d-flex align-items-center justify-content-center">
                                     @if (User?.Identity?.IsAuthenticated == false)
@@ -117,7 +137,7 @@
                                     <span>Edit</span>
                                 </a>
 
-                                <form method="post" asp-page="/Records/Delete" asp-route-id="@Model.Records[i].Id" class="w-100">
+                                <form method="post" asp-page="/Records/Delete" asp-route-id="@Model.Records[i].Id" class="w-100 mb-0">
                                     <button type="submit" class="btn btn-secondary @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center" value="Delete">
                                         @if (User?.Identity?.IsAuthenticated == false)
                                         {
