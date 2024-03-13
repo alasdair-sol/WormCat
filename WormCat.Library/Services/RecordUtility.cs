@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using WormCat.Library.Models;
 
-namespace WormCat.Library.Utility
+namespace WormCat.Library.Services
 {
     public class RecordUtility : IRecordUtility
     {

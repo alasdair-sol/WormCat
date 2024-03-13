@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using WormCat.Library.Models;
-using WormCat.Library.Utility;
+using WormCat.Library.Services;
 
 namespace WormCat.Razor.Pages.Records
 {
@@ -10,9 +10,9 @@ namespace WormCat.Razor.Pages.Records
     {
         private readonly WormCat.Data.Data.WormCatRazorContext _context;
         private readonly IRecordUtility _recordUtility;
-        private readonly IEnrichedContentProvider _enrichedContentProvider;
+        private readonly IEnrichedContentService _enrichedContentProvider;
 
-        public CreateModel(WormCat.Data.Data.WormCatRazorContext context, IRecordUtility recordUtility, IEnrichedContentProvider enrichedContentProvider)
+        public CreateModel(WormCat.Data.Data.WormCatRazorContext context, IRecordUtility recordUtility, IEnrichedContentService enrichedContentProvider)
         {
             _context = context;
             _recordUtility = recordUtility;

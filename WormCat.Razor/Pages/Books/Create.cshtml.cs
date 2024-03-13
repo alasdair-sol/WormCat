@@ -5,19 +5,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.ComponentModel.DataAnnotations;
 using WormCat.Library.Models;
-using WormCat.Library.Utility;
+using WormCat.Library.Services;
 
 namespace WormCat.Razor.Pages.Books
 {
     public class CreateModel : PageModel
     {
         private readonly WormCat.Data.Data.WormCatRazorContext _context;
-        private readonly IGenericUtility _genericUtility;
+        private readonly IGenericService _genericUtility;
 
         public IEnumerable<SelectListItem>? Containers;
         public IEnumerable<SelectListItem>? Records;
 
-        public CreateModel(WormCat.Data.Data.WormCatRazorContext context, IGenericUtility genericUtility)
+        public CreateModel(WormCat.Data.Data.WormCatRazorContext context, IGenericService genericUtility)
         {
             _context = context;
             _genericUtility = genericUtility;

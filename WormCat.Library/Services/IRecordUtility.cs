@@ -1,6 +1,6 @@
 ﻿using WormCat.Library.Models;
 
-namespace WormCat.Library.Utility
+namespace WormCat.Library.Services
 {
     public interface IRecordUtility
     {

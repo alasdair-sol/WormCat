@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
 using System.Security.Principal;
 
-namespace WormCat.Library.Utility
+namespace WormCat.Library.Services
 {
-    public interface IAuthDisplayUtility
+    public interface IAuthDisplayService
     {
         string CSSAuthColour { get; }
         string CSSAuthDisabled { get; }

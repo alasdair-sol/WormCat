@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WormCat.Razor.Data;
 using WormCat.Data.Data;
 using WormCat.Razor.Models;
-using WormCat.Library.Utility;
+using WormCat.Library.Services;
 using Microsoft.AspNetCore.Authorization;
 
 var builder = CreateBuilder(args);
@@ -72,11 +72,11 @@ static void ConfigureServices(IConfigurationManager config, IServiceCollection s
          .UseLazyLoadingProxies()
          .UseSqlServer(wormCatConnectionString, m => m.MigrationsAssembly("WormCat.Data")));
 
-    services.AddSingleton<IAuthDisplayUtility, AuthDisplayUtilityDev>();
-    services.AddSingleton<IGenericUtility, GenericUtility>();
+    services.AddSingleton<IAuthDisplayService, AuthDisplayServiceDev>();
+    services.AddSingleton<IGenericService, GenericService>();
     services.AddSingleton<IRecordUtility, RecordUtility>();
 
-    services.AddSingleton<IEnrichedContentProvider, EnrichedContentProviderGoogle>();
+    services.AddSingleton<IEnrichedContentService, EnrichedContentServiceGoogle>();
 
     services.AddScoped<SeedDatabase>();
     services.AddRazorPages();

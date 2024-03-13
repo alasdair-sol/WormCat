@@ -11,17 +11,17 @@ using System.Web;
 using WormCat.Library.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace WormCat.Library.Utility
+namespace WormCat.Library.Services
 {
-    public class EnrichedContentProviderGoogle : IEnrichedContentProvider
+    public class EnrichedContentServiceGoogle : IEnrichedContentService
     {
-        private readonly ILogger<EnrichedContentProviderGoogle> _logger;
+        private readonly ILogger<EnrichedContentServiceGoogle> _logger;
         private readonly IConfiguration _config;
         private readonly IRecordUtility _recordUtility;
 
         public string DisplayName => "Google Books";
 
-        public EnrichedContentProviderGoogle(ILogger<EnrichedContentProviderGoogle> logger, IConfiguration config, IRecordUtility recordUtility)
+        public EnrichedContentServiceGoogle(ILogger<EnrichedContentServiceGoogle> logger, IConfiguration config, IRecordUtility recordUtility)
         {
             _logger = logger;
             _config = config;

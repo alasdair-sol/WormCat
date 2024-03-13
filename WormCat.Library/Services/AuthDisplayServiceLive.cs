@@ -2,11 +2,11 @@
 using System.Security.Claims;
 using System.Security.Principal;
 
-namespace WormCat.Library.Utility
+namespace WormCat.Library.Services
 {
-    public class AuthDisplayUtilityLive : IAuthDisplayUtility
+    public class AuthDisplayServiceLive : IAuthDisplayService
     {
-        public AuthDisplayUtilityLive(IHttpContextAccessor httpContextAccessor)
+        public AuthDisplayServiceLive(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }

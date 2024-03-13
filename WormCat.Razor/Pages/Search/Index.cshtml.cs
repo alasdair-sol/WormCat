@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WormCat.Library.Models;
-using WormCat.Library.Utility;
+using WormCat.Library.Services;
 using WormCat.Razor.Models;
 
 namespace WormCat.Razor.Pages.Search

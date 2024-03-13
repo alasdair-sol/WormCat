@@ -1,8 +1,8 @@
 ﻿using WormCat.Library.Models;
 
-namespace WormCat.Library.Utility
+namespace WormCat.Library.Services
 {
-    public interface IEnrichedContentProvider
+    public interface IEnrichedContentService
     {
         public string DisplayName { get; }
         public EnrichedContentModel? GetEnrichedContent(string isbn);

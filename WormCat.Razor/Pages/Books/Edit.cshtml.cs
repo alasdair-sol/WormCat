@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WormCat.Library.Models;
-using WormCat.Library.Utility;
+using WormCat.Library.Services;
 
 namespace WormCat.Razor.Pages.Books
 {
@@ -11,14 +11,14 @@ namespace WormCat.Razor.Pages.Books
     {
         private readonly ILogger<EditModel> _logger;
         private readonly WormCat.Data.Data.WormCatRazorContext _context;
-        private readonly IGenericUtility _genericUtility;
+        private readonly IGenericService _genericUtility;
         public IEnumerable<SelectListItem>? Containers;
         public IEnumerable<SelectListItem>? Records;
 
         [BindProperty]
         public Book Book { get; set; } = default!;
 
-        public EditModel(ILogger<EditModel> logger, WormCat.Data.Data.WormCatRazorContext context, IGenericUtility genericUtility)
+        public EditModel(ILogger<EditModel> logger, WormCat.Data.Data.WormCatRazorContext context, IGenericService genericUtility)
         {
             _context = context;
             _logger = logger;
