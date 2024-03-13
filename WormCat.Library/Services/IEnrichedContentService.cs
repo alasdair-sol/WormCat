@@ -5,6 +5,6 @@ namespace WormCat.Library.Services
     public interface IEnrichedContentService
     {
         public string DisplayName { get; }
-        public EnrichedContentModel? GetEnrichedContent(string isbn);
+        public Task<EnrichedContentModel?> GetEnrichedContentAsync(string isbn);
     }
 }

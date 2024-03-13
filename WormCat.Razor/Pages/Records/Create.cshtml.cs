@@ -36,13 +36,13 @@ namespace WormCat.Razor.Pages.Records
             return Page();
         }
 
-        public IActionResult OnGetCreateFromContentProvider(string? query)
+        public async Task<IActionResult> OnGetCreateFromContentProvider(string? query)
         {
             if (string.IsNullOrWhiteSpace(query) == false)
             {
                 Record.ISBN = query;
 
-                EnrichedContentModel? enrichedContentModel = _enrichedContentProvider.GetEnrichedContent(query);
+                EnrichedContentModel? enrichedContentModel = await _enrichedContentProvider.GetEnrichedContentAsync(query);
 
                 if (enrichedContentModel != null)
                 {

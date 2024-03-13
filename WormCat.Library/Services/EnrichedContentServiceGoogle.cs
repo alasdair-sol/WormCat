@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -9,6 +11,7 @@ using System.Net;
 using System.Text;
 using System.Web;
 using WormCat.Library.Models;
+using WormCat.Library.Models.GoogleBooks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WormCat.Library.Services
@@ -16,73 +19,35 @@ namespace WormCat.Library.Services
     public class EnrichedContentServiceGoogle : IEnrichedContentService
     {
         private readonly ILogger<EnrichedContentServiceGoogle> _logger;
-        private readonly IConfiguration _config;
-        private readonly IRecordUtility _recordUtility;
+        private readonly HttpServiceDefault _httpServiceDefault;
+        private readonly HttpServiceGoogleBooks _httpServiceGoogleBooks;
 
         public string DisplayName => "Google Books";
 
-        public EnrichedContentServiceGoogle(ILogger<EnrichedContentServiceGoogle> logger, IConfiguration config, IRecordUtility recordUtility)
+        public EnrichedContentServiceGoogle(ILogger<EnrichedContentServiceGoogle> logger, HttpServiceDefault httpServiceDefault, HttpServiceGoogleBooks httpServiceGoogleBooks)
         {
             _logger = logger;
-            _config = config;
-            _recordUtility = recordUtility;
-        }
+            _httpServiceDefault = httpServiceDefault;
+            _httpServiceGoogleBooks = httpServiceGoogleBooks;
+        }   
 
-        private EnrichedContentModel? PullEnrichedContent(string query)
+        /// <summary>
+        /// Returns a list of enriched book content from Google Books Api
+        /// </summary>
+        /// <param name="isbn">The ISBN of the book to search for</param>
+        public async Task<EnrichedContentModel?> GetEnrichedContentAsync(string isbn)
         {
             try
             {
-                EnrichedContentModel model = new EnrichedContentModel();
-                string uri = $"https://www.googleapis.com/books/v1/volumes?q={query}&key={_config["ApiKeys:GoogleBooks"]}&fields=items(volumeInfo/title),items(volumeInfo/authors),items(volumeInfo/publishedDate),items(volumeInfo/pageCount),items(searchInfo/textSnippet),items(volumeInfo/imageLinks/thumbnail)";
-                string result = string.Empty;
+                GoogleBooksVolumeCollectionModel googleBooksCollection = await _httpServiceGoogleBooks.GetGoogleBooksVolume($"isbn:{isbn}");
 
-                HttpWebRequest request = WebRequest.CreateHttp(uri);
-                request.Accept = "application/json";
-                request.Method = "GET";
+                EnrichedContentModel model = ExtractEnrichedContentModelFromVolumeInfo(googleBooksCollection);
 
-                _logger.LogInformation($"HttpWebRequest -\nRequest\n{JsonConvert.SerializeObject(request, Formatting.Indented)}\n\nResult\n{result}");
+                if (model == null) throw new Exception($"No book found with isbn {isbn}");
 
+                model.Image = await ExtractImageFromEnrichedContent(model);
 
-                using (HttpWebResponse httpResponse = (HttpWebResponse)request.GetResponse())
-                {
-                    // Read the response to a string
-                    using (StreamReader sr = new StreamReader(httpResponse.GetResponseStream()))
-                    {
-                        result = sr.ReadToEnd();
-
-                        dynamic dynamicResult = JsonConvert.DeserializeObject<dynamic>(result);
-
-                        JArray array = dynamicResult?.items as JArray ?? new JArray();
-
-                        foreach (JToken item in array)
-                        {
-                            JToken volumeInfo = item["volumeInfo"];
-                            JToken searchInfo = item["searchInfo"];
-
-                            model.Title = volumeInfo?["title"]?.Value<string>() ?? string.Empty;
-
-                            foreach (JToken author in volumeInfo?["authors"] ?? new JArray())
-                            {
-                                model.Author = author.Value<string>() ?? string.Empty;
-
-                                // Break after first author, as we only store one.
-                                if (string.IsNullOrWhiteSpace(model.Author) == false)
-                                    break;
-                            }
-
-                            model.PublicationDate = volumeInfo?["publishedDate"]?.Value<string>() ?? string.Empty;
-                            model.PageCount = volumeInfo?["pageCount"]?.Value<int>() ?? 0;
-                            model.Synopsis = HttpUtility.HtmlDecode(searchInfo?["textSnippet"]?.Value<string>() ?? string.Empty);
-                            model.Image = volumeInfo?["imageLinks"]?["thumbnail"].Value<string>() ?? string.Empty;
-
-                            // Break after first item, as google books api returns all volumes available
-                            break;
-                        }
-                    }
-
-                    _logger.LogInformation($"HttpWebRequest -\nRequest\n{request}\n\nResponse\n{httpResponse}\n\nResult\n{result}");
-                    return model;
-                }
+                return model;
             }
             catch (Exception ex)
             {
@@ -91,134 +56,34 @@ namespace WormCat.Library.Services
             }
         }
 
-        private List<EnrichedContentModel> PullAllEnrichedContent(string query)
+        /// <summary>
+        /// Extracts all relevant information from a Google Books Api response, and populates an Enriched Content Model with the information.
+        /// 
+        /// Note: This takes in a collection of items, but only parses the first entry
+        /// Note: This is because the Google Books Api will return fuzzy matches, and the further into the response you go, the less relevant the information is
+        /// </summary>
+        /// <param name="googleBooksCollection">A model depicting the response of a Google Books Api request</param>
+        private EnrichedContentModel ExtractEnrichedContentModelFromVolumeInfo(GoogleBooksVolumeCollectionModel googleBooksCollection)
         {
-            List<EnrichedContentModel> models = new List<EnrichedContentModel>();
-
             try
             {
-                string uri = $"https://www.googleapis.com/books/v1/volumes?q={query}&key={_config["ApiKeys:GoogleBooks"]}&fields=items(volumeInfo/title),items(volumeInfo/authors),items(volumeInfo/publishedDate),items(volumeInfo/pageCount),items(searchInfo/textSnippet),items(volumeInfo/imageLinks/thumbnail)";
-                string result = string.Empty;
+                EnrichedContentModel model = new EnrichedContentModel();
 
-                HttpWebRequest request = WebRequest.CreateHttp(uri);
-                request.Accept = "application/json";
-                request.Method = "GET";
-
-                _logger.LogInformation($"HttpWebRequest -\nRequest\n{JsonConvert.SerializeObject(request, Formatting.Indented)}\n\nResult\n{result}");
-
-
-                using (HttpWebResponse httpResponse = (HttpWebResponse)request.GetResponse())
+                foreach (GoogleBooksVolumeModel volume in googleBooksCollection.Items!)
                 {
-                    // Read the response to a string
-                    using (StreamReader sr = new StreamReader(httpResponse.GetResponseStream()))
-                    {
-                        result = sr.ReadToEnd();
+                    if (volume == null)
+                        continue;
 
-                        dynamic dynamicResult = JsonConvert.DeserializeObject<dynamic>(result);
+                    model.Title = volume.VolumeInfo?.Title ?? string.Empty;
+                    model.Author ??= volume.VolumeInfo?.Authors?.FirstOrDefault() ?? string.Empty;
+                    model.PublicationDate ??= volume.VolumeInfo?.PublishedDate ?? string.Empty;
+                    model.PageCount ??= volume.VolumeInfo?.PageCount ?? 0;
+                    model.Synopsis ??= volume.SearchInfo?.TextSnippet ?? string.Empty;
+                    model.Image ??= volume.VolumeInfo?.ImageLinks?.Thumbnail ?? string.Empty;
 
-                        JArray array = dynamicResult?.items as JArray ?? new JArray();
-
-                        foreach (JToken item in array)
-                        {
-                            EnrichedContentModel model = new EnrichedContentModel();
-
-                            JToken volumeInfo = item["volumeInfo"];
-                            JToken searchInfo = item["searchInfo"];
-
-                            model.Title = volumeInfo?["title"]?.Value<string>() ?? string.Empty;
-
-                            foreach (JToken author in volumeInfo?["authors"] ?? new JArray())
-                            {
-                                model.Author = author.Value<string>() ?? string.Empty;
-
-                                // Break after first author, as we only store one.
-                                if (string.IsNullOrWhiteSpace(model.Author) == false)
-                                    break;
-                            }
-
-                            model.PublicationDate = volumeInfo?["publishedDate"]?.Value<string>() ?? string.Empty;
-                            model.PageCount = volumeInfo?["pageCount"]?.Value<int>() ?? 0;
-                            model.Synopsis = HttpUtility.HtmlDecode(searchInfo?["textSnippet"]?.Value<string>() ?? string.Empty);
-                            model.Image = volumeInfo?["imageLinks"]?["thumbnail"].Value<string>() ?? string.Empty;
-
-                            models.Add(model);
-                        }
-                    }
-
-                    _logger.LogInformation($"HttpWebRequest -\nRequest\n{request}\n\nResponse\n{httpResponse}\n\nResult\n{result}");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-            }
-
-            return models;
-        }
-
-        private byte[]? DownloadImageUrl(string url)
-        {
-            try
-            {
-                byte[]? coverImage = null;
-
-                WebClient webClient = new WebClient();
-                coverImage = webClient.DownloadData(url);
-
-                return coverImage;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-            }
-
-            return null;
-        }
-
-        public EnrichedContentModel? GetEnrichedContent(string isbn)
-        {
-            try
-            {
-                EnrichedContentModel? model = PullEnrichedContent($"isbn:{isbn}");
-
-                if (model == null) throw new Exception($"No book found with isbn {isbn}");
-
-                string initialImage = model.Image;
-                model.Image = string.Empty;
-
-                string query = "";
-
-                if (string.IsNullOrWhiteSpace(model.Title) == false)
-                    query += $"intitle:{model.Title}+";
-
-                if (string.IsNullOrWhiteSpace(model.Author) == false)
-                    query += $"inauthor:{model.Author}+";
-
-                List<EnrichedContentModel> tmpModels = PullAllEnrichedContent(query);
-
-                if (string.IsNullOrWhiteSpace(initialImage) == false)
-                    tmpModels.Add(new EnrichedContentModel { Image = initialImage });
-
-                foreach (EnrichedContentModel tmpModel in tmpModels)
-                {
-                    // Break once we have downloaded an image
-                    if (string.IsNullOrWhiteSpace(model.Image) == false) break;
-
-                    // Iterate if no image found in tmp model
-                    if (string.IsNullOrWhiteSpace(tmpModel.Image)) continue;
-
-                    tmpModel.Image = tmpModel.Image.Replace("zoom=1", "zoom=2").Replace("&edge=curl", "");
-
-                    // Download the tmp image url
-                    byte[]? bytes = DownloadImageUrl(tmpModel.Image);
-
-                    // If the image is considered "valid", store it in the response model image as a Base64 string
-                    if (bytes != null && bytes.Length > 100)
-                    {
-                        model.Image = System.Convert.ToBase64String(bytes);
-
-                        _logger.LogInformation($"Found image link for isbn {isbn}\n{tmpModel.Image}");
-                    }
+                    // Break after first iteration as that will be the most relevant volume
+                    // Other volumes after this may be incorrect books
+                    break;
                 }
 
                 return model;
@@ -228,6 +93,87 @@ namespace WormCat.Library.Services
                 _logger.LogError(ex, ex.Message);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Tries to pull an image from an EnrichedContentModel object
+        /// This method will first check the model.Image parameter
+        /// If that does not return a valid response, it will then perform another request to Google Books Api based on author/title
+        /// It will then check these for a valid image
+        /// 
+        /// Note: The model.Image should be a url (at this point) supplied by the Google Books Api        
+        /// </summary>
+        /// <param name="model">The model to base any future requests off</param>
+        /// <returns>A Base64 encoded string of the first image that is found, or an empty string</returns>
+        private async Task<string> ExtractImageFromEnrichedContent(EnrichedContentModel model)
+        {
+            try
+            {
+                byte[]? imageBytes = null;
+
+                // Attempt to construct an image from the original value
+                if (string.IsNullOrWhiteSpace(model.Image) == false)
+                    imageBytes = await FetchImageBytes(model.Image);
+
+                // If the original value is valid, return that
+                if (imageBytes != null)
+                    return Convert.ToBase64String(imageBytes);
+
+                // Construct the query string to include book title
+                string query = string.IsNullOrWhiteSpace(model.Title) ? string.Empty : $"intitle:{model.Title}+";
+
+                // If available, include book author in query string
+                if (string.IsNullOrWhiteSpace(model.Author) == false)
+                    query += $"inauthor:{model.Author}+";
+
+                // Fetch volumes that match query
+                GoogleBooksVolumeCollectionModel googleBooksCollection = await _httpServiceGoogleBooks.GetGoogleBooksVolume(query);
+
+                foreach (GoogleBooksVolumeModel item in googleBooksCollection.Items!)
+                {
+                    if (item == null)
+                        continue;
+
+                    if (string.IsNullOrWhiteSpace(item.VolumeInfo?.ImageLinks?.Thumbnail) == false)
+                        imageBytes = await FetchImageBytes(item.VolumeInfo.ImageLinks.Thumbnail);
+
+                    if (imageBytes != null)
+                        return Convert.ToBase64String(imageBytes);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Downloads an image at a given URL, and performs some data manipulation
+        /// </summary>
+        /// <param name="imageUrl">The URL to fetch the image from</param>
+        /// <returns>A byte array containing the found image, or null</returns>
+        private async Task<byte[]?> FetchImageBytes(string imageUrl)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(imageUrl))
+                    throw new ArgumentNullException(nameof(imageUrl));
+
+                imageUrl = imageUrl.Replace("zoom=1", "zoom=2").Replace("&edge=curl", "");
+
+                byte[]? imageBytes = await _httpServiceDefault.GetAsByteArrayAsync(imageUrl);
+
+                if (imageBytes != null && imageBytes.Length > 100)
+                    return imageBytes;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
+
+            return null;
         }
     }
 }

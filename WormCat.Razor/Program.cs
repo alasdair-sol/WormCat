@@ -1,51 +1,23 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using WormCat.Razor.Data;
+using Polly;
 using WormCat.Data.Data;
-using WormCat.Razor.Models;
 using WormCat.Library.Services;
-using Microsoft.AspNetCore.Authorization;
+using WormCat.Razor.Data;
+using WormCat.Razor.Models;
 
 var builder = CreateBuilder(args);
-/*var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
-
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();*/
 
 ConfigureServices(builder.Configuration, builder.Services);
 ConfigureIdentity(builder.Configuration, builder.Services);
 
-var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    scope.ServiceProvider.GetRequiredService<SeedDatabase>().TrySeed();
-}
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseMigrationsEndPoint();
-}
-else
-{
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapRazorPages();
+var app = BuildApplication(builder);
 
 app.Run();
+
+
+// ------------------------------------------------------------------------------
+
 
 static WebApplicationBuilder CreateBuilder(string[] args)
 {
@@ -58,10 +30,41 @@ static WebApplicationBuilder CreateBuilder(string[] args)
 }
 
 static void ConfigureServices(IConfigurationManager config, IServiceCollection services)
-{    
+{
     // Add services to the container.
     var defaultConnectionString = config.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
     var wormCatConnectionString = config.GetConnectionString("WormCatRazorContext") ?? throw new InvalidOperationException("Connection string 'WormCatRazorContext' not found.");
+
+    var timeoutPolicyDefault = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(10));
+    var timeoutPolicyLong = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(30));
+
+    services.AddHttpClient<HttpServiceDefault>()
+        .AddTransientHttpErrorPolicy(policyBuilder =>
+        {
+            // Wait and Retry 3 times, with incrementing wait periods
+            return policyBuilder.WaitAndRetryAsync(3, iteration => TimeSpan.FromMilliseconds(600 * iteration));
+        }).AddPolicyHandler(httpRequestMessage =>
+        {
+            // Set default timeout for GET requests, and longer for other requests
+            if (httpRequestMessage.Method == HttpMethod.Get)
+                return timeoutPolicyDefault;
+            else return timeoutPolicyLong;
+        });
+
+    services.AddHttpClient<HttpServiceGoogleBooks>()
+        .AddTransientHttpErrorPolicy(policyBuilder =>
+        {
+            // Wait and Retry 3 times, with incrementing wait periods
+            return policyBuilder.WaitAndRetryAsync(3, iteration => TimeSpan.FromMilliseconds(600 * iteration));
+        }).AddPolicyHandler(httpRequestMessage =>
+        {
+            // Set default timeout for GET requests, and longer for other requests
+            if (httpRequestMessage.Method == HttpMethod.Get)
+                return timeoutPolicyDefault;
+            else return timeoutPolicyLong;
+        });
+
+    services.AddHttpLogging((opt) => { });
 
     services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(defaultConnectionString));
@@ -110,4 +113,37 @@ static void ConfigureIdentity(ConfigurationManager configuration, IServiceCollec
 
     services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
         .AddEntityFrameworkStores<ApplicationDbContext>();
+}
+
+static WebApplication BuildApplication(WebApplicationBuilder builder)
+{
+    var app = builder.Build();
+
+    app.Logger.LogInformation($"App is running in [{app.Environment.EnvironmentName}] mode");
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseMigrationsEndPoint();
+    }
+    else
+    {
+        app.UseExceptionHandler("/Error");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+    }
+
+    app.UseHttpLogging();
+
+    app.UseHttpsRedirection();
+    app.UseStaticFiles();
+
+    app.UseRouting();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapRazorPages();
+
+    return app;
 }
