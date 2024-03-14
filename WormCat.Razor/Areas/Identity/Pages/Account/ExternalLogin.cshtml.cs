@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using WormCat.Razor.Areas.Identity.Data;
 using WormCat.Data.DataAccess.Interfaces;
+using WormCat.Razor.Utility;
 
 namespace WormCat.Razor.Areas.Identity.Pages.Account
 {
@@ -82,6 +83,10 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+            [Required]
+            [Display(Name = "Username")]
+            public string CustomUsername { get; set; }
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -90,7 +95,7 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
             [EmailAddress]
             public string Email { get; set; }
         }
-        
+
         public IActionResult OnGet() => RedirectToPage("./Login");
 
         public IActionResult OnPost(string provider, string returnUrl = null)
@@ -143,6 +148,17 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
             {
                 return RedirectToPage("./Lockout");
             }
+            else if (result.IsNotAllowed)
+            {
+                var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+
+                if (user != null && user.EmailConfirmed == false && _userManager.Options.SignIn.RequireConfirmedAccount)
+                {
+                    return RedirectToPage("./RegisterConfirmation", new { Email = user.Email });
+                }
+
+                return Page();
+            }
             else
             {
                 // If the user does not have an account, then ask the user to create an account.
@@ -170,6 +186,17 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
 
+            bool customUsernameTaken = await AuthUtility.CustomUsernameTaken(_userManager, Input.CustomUsername);
+
+            if (customUsernameTaken)
+            {
+                ModelState.AddModelError(string.Empty, "Username taken");
+
+                ProviderDisplayName = info.ProviderDisplayName;
+                ReturnUrl = returnUrl;
+                return Page();
+            }
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -177,7 +204,10 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
+                user.CustomUsername = Input.CustomUsername;
+
                 var result = await _userManager.CreateAsync(user);
+
                 if (result.Succeeded)
                 {
                     result = await _userManager.AddLoginAsync(user, info);

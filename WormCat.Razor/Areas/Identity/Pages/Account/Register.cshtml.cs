@@ -17,8 +17,10 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WormCat.Razor.Areas.Identity.Data;
+using WormCat.Razor.Utility;
 
 namespace WormCat.Razor.Areas.Identity.Pages.Account
 {
@@ -72,6 +74,14 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
         public class InputModel
         {
             /// <summary>
+            /// A custom username for the user.
+            /// NOTE: This is different from IdentityUser.UserName/IdentityUser.NormalizedUserName (which is usually the email address of this user)
+            /// </summary>
+            [Required]
+            [Display(Name = "Username")]
+            public string CustomUsername { get; set; }
+
+            /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
@@ -107,13 +117,26 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
+
+
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            bool customUsernameTaken = await AuthUtility.CustomUsernameTaken(_userManager, Input.CustomUsername);
+
+            if (customUsernameTaken)
+            {
+                ModelState.AddModelError(string.Empty, "Username taken");
+                return Page();
+            }
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
+
+                user.CustomUsername = Input.CustomUsername;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);

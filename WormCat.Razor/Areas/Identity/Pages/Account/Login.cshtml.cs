@@ -144,6 +144,20 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
                     _logger.LogWarning("User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
+                else if (result.IsNotAllowed)
+                {
+                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    {
+                        var user = await _userManager.FindByEmailAsync(Input.Email);
+
+                        bool passwordMatch = await _userManager.CheckPasswordAsync(user, Input.Password);
+
+                        if (passwordMatch && user.EmailConfirmed == false)
+                            return RedirectToPage("./RegisterConfirmation", new { Email = user.Email });
+                    }
+
+                    return Page();
+                }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");

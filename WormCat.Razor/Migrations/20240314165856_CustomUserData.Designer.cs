@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WormCat.Razor.Data;
 
@@ -11,9 +12,11 @@ using WormCat.Razor.Data;
 namespace WormCat.Razor.Migrations
 {
     [DbContext(typeof(WormCatAuthContext))]
-    partial class WormCatAuthContextModelSnapshot : ModelSnapshot
+    [Migration("20240314165856_CustomUserData")]
+    partial class CustomUserData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,7 +175,7 @@ namespace WormCat.Razor.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CustomUsername")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -215,10 +218,6 @@ namespace WormCat.Razor.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CustomUsername")
-                        .IsUnique()
-                        .HasFilter("[CustomUsername] IS NOT NULL");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
