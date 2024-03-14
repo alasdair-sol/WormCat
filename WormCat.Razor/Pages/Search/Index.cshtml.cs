@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using WormCat.Library.Models;
+using WormCat.Library.Models.Dbo;
 using WormCat.Library.Services;
 using WormCat.Razor.Models;
 

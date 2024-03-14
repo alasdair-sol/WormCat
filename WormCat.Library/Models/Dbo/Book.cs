@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WormCat.Library.Models
+namespace WormCat.Library.Models.Dbo
 {
     public class Book
     {

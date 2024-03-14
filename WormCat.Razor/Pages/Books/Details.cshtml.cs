@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using WormCat.Library.Models;
+using WormCat.Library.Models.Dbo;
 
 namespace WormCat.Razor.Pages.Books
 {

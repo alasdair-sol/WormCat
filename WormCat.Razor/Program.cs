@@ -2,7 +2,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Polly;
 using WormCat.Data.Data;
+using WormCat.Data.DataAccess;
+using WormCat.Data.DataAccess.Interfaces;
 using WormCat.Library.Services;
+using WormCat.Razor.Areas.Identity.Data;
 using WormCat.Razor.Data;
 using WormCat.Razor.Models;
 
@@ -32,7 +35,7 @@ static WebApplicationBuilder CreateBuilder(string[] args)
 static void ConfigureServices(IConfigurationManager config, IServiceCollection services)
 {
     // Add services to the container.
-    var defaultConnectionString = config.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+    //var defaultConnectionString = config.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
     var wormCatConnectionString = config.GetConnectionString("WormCatRazorContext") ?? throw new InvalidOperationException("Connection string 'WormCatRazorContext' not found.");
 
     var timeoutPolicyDefault = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(10));
@@ -66,8 +69,8 @@ static void ConfigureServices(IConfigurationManager config, IServiceCollection s
 
     services.AddHttpLogging((opt) => { });
 
-    services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(defaultConnectionString));
+    //services.AddDbContext<ApplicationDbContext>(options =>
+    //    options.UseSqlServer(defaultConnectionString));
     services.AddDatabaseDeveloperPageExceptionFilter();
 
     services.AddDbContext<WormCatRazorContext>(options =>
@@ -81,12 +84,29 @@ static void ConfigureServices(IConfigurationManager config, IServiceCollection s
 
     services.AddSingleton<IEnrichedContentService, EnrichedContentServiceGoogle>();
 
+    services.AddScoped<IUserAccess, UserAccess>();
+    services.AddScoped<IRecordAccess, RecordAccess>();
+    services.AddScoped<IContainerAccess, ContainerAccess>();
+    services.AddScoped<IBookAccess, BookAccess>();
+    services.AddScoped<ILocationAccess, LocationAccess>();
+
     services.AddScoped<SeedDatabase>();
+
     services.AddRazorPages();
 }
 
-static void ConfigureIdentity(ConfigurationManager configuration, IServiceCollection services)
+static void ConfigureIdentity(IConfigurationManager config, IServiceCollection services)
 {
+    var connectionString = config.GetConnectionString("WormCatAuthContextConnection") ?? throw new InvalidOperationException("Connection string 'WormCatAuthContexstConnection' not found.");
+
+    services.AddDbContext<WormCatAuthContext>(options => options.UseSqlServer(connectionString));
+
+    services.AddDefaultIdentity<WormCatUser>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = true;
+        options.User.RequireUniqueEmail = true;
+    }).AddEntityFrameworkStores<WormCatAuthContext>();
+
     services.Configure<IdentityOptions>(options =>
     {
         options.Password.RequiredLength = 4;
@@ -98,8 +118,8 @@ static void ConfigureIdentity(ConfigurationManager configuration, IServiceCollec
 
     services.AddAuthentication().AddGoogle(opt =>
     {
-        opt.ClientId = configuration["Authentication:Google:ClientId"];
-        opt.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+        opt.ClientId = config["Authentication:Google:ClientId"] ?? string.Empty;
+        opt.ClientSecret = config["Authentication:Google:ClientSecret"] ?? string.Empty;
     });
 
     services.AddAuthorization(options =>
@@ -111,8 +131,8 @@ static void ConfigureIdentity(ConfigurationManager configuration, IServiceCollec
 
     services.AddHttpContextAccessor();
 
-    services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-        .AddEntityFrameworkStores<ApplicationDbContext>();
+    //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    //    .AddEntityFrameworkStores<ApplicationDbContext>();
 }
 
 static WebApplication BuildApplication(WebApplicationBuilder builder)

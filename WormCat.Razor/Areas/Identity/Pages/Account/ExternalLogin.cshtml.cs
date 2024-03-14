@@ -17,25 +17,29 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using WormCat.Razor.Areas.Identity.Data;
+using WormCat.Data.DataAccess.Interfaces;
 
 namespace WormCat.Razor.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class ExternalLoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IUserStore<IdentityUser> _userStore;
-        private readonly IUserEmailStore<IdentityUser> _emailStore;
+        private readonly SignInManager<WormCatUser> _signInManager;
+        private readonly UserManager<WormCatUser> _userManager;
+        private readonly IUserStore<WormCatUser> _userStore;
+        private readonly IUserEmailStore<WormCatUser> _emailStore;
         private readonly IEmailSender _emailSender;
+        private readonly IUserAccess userAccess;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
-            SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager,
-            IUserStore<IdentityUser> userStore,
+            SignInManager<WormCatUser> signInManager,
+            UserManager<WormCatUser> userManager,
+            IUserStore<WormCatUser> userStore,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IUserAccess userAccess)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -43,6 +47,7 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _logger = logger;
             _emailSender = emailSender;
+            this.userAccess = userAccess;
         }
 
         /// <summary>
@@ -115,6 +120,22 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
+                WormCatUser wormCatUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+
+                if (wormCatUser == null)
+                {
+                    _logger.LogError("Failed to find user by Email when attempting to create User Dbo");
+                    return NotFound();
+                }
+
+                Library.Models.Dbo.User userDbo = await userAccess.TryCreateNewAsync(wormCatUser.Id);
+
+                if (userDbo == null)
+                {
+                    _logger.LogError("Failed to create User Dbo upon login");
+                    return NotFound();
+                }
+
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
@@ -197,27 +218,27 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private IdentityUser CreateUser()
+        private WormCatUser CreateUser()
         {
             try
             {
-                return Activator.CreateInstance<IdentityUser>();
+                return Activator.CreateInstance<WormCatUser>();
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(IdentityUser)}'. " +
-                    $"Ensure that '{nameof(IdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(WormCatUser)}'. " +
+                    $"Ensure that '{nameof(WormCatUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the external login page in /Areas/Identity/Pages/Account/ExternalLogin.cshtml");
             }
         }
 
-        private IUserEmailStore<IdentityUser> GetEmailStore()
+        private IUserEmailStore<WormCatUser> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-            return (IUserEmailStore<IdentityUser>)_userStore;
+            return (IUserEmailStore<WormCatUser>)_userStore;
         }
     }
 }

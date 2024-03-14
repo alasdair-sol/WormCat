@@ -1,9 +1,10 @@
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using WormCat.Library.Models;
+using WormCat.Data.DataAccess.Interfaces;
+using WormCat.Library.Models.Dbo;
 using WormCat.Razor.Models;
 
 namespace WormCat.Razor.Pages
@@ -13,10 +14,8 @@ namespace WormCat.Razor.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly WormCat.Data.Data.WormCatRazorContext _context;
+        private readonly IRecordAccess recordAccess;
         private readonly SeedDatabase _seedDatabase;
-
-        [BindProperty(SupportsGet = true)]
-        public string? query { get; set; } = string.Empty;
 
         [BindProperty(SupportsGet = true)]
         public string? action { get; set; } = string.Empty;
@@ -31,10 +30,11 @@ namespace WormCat.Razor.Pages
             new SelectListItem("Author (des)", "author_desc")
         };
 
-        public IndexModel(ILogger<IndexModel> logger, WormCat.Data.Data.WormCatRazorContext context, SeedDatabase seedDatabase)
+        public IndexModel(ILogger<IndexModel> logger, WormCat.Data.Data.WormCatRazorContext context, IRecordAccess recordAccess, SeedDatabase seedDatabase)
         {
             _logger = logger;
             _context = context;
+            this.recordAccess = recordAccess;
             this._seedDatabase = seedDatabase;
         }
 
@@ -44,33 +44,60 @@ namespace WormCat.Razor.Pages
         {
             _logger.LogInformation("OnGetAsync");
 
-            // Use IQueryable to reduce database reads
-            IQueryable<Record> recordsQuery = _context.Record.Include(x => x.Books!).ThenInclude(x => x.Container).ThenInclude(x => x.Location);
-            SortRecordQuery(ref recordsQuery);
+            //if (User.Identity.IsAuthenticated)
+            //{
+            //    await _context.UserGroups.AddAsync(new UserGroup()
+            //    {
+            //        UserId = User.Identity.GetUserId(),
+            //        OtherUserIds = new List<string> { User.Identity.GetUserId(), User.Identity.GetUserId() }
+            //    });
 
-            if (string.IsNullOrWhiteSpace(query) == false)
+            //    await _context.SaveChangesAsync();
+            //}
+
+            try
             {
-                var isbnRecord = await _context.Record.Where(x => x.ISBN.ToString() == query).FirstOrDefaultAsync();
+                // Use IQueryable to reduce database reads
+                //IQueryable<Record> recordsQuery = _context.Record.Include(x => x.Books!).ThenInclude(x => x.Container).ThenInclude(x => x.Location);
 
-                if (isbnRecord != null)
+                Records = await recordAccess.GetAllForUserAsync(User.Identity.GetUserId(), true);
+
+                /*var query = from record in _context.Set<Record>()
+                            join book in _context.Set<Book>() on record.Id equals book.RecordId
+                            join con in _context.Set<Container>() on book.ContainerId equals con.Id
+                            join loc in _context.Set<Location>() on con.LocationId equals loc.Id
+                            group record by loc.UserIds
+                            into g
+                            where g.Key
+                            select record;*/
+
+                //SortRecordQuery(ref recordsQuery);
+
+                /*if (string.IsNullOrWhiteSpace(query) == false)
                 {
-                    // If the search query matches an existing barcode, redirect to view that copy specifically.
-                    return LocalRedirect($"/Records/Details?id={isbnRecord.Id}");
-                }
+                    var isbnRecord = await _context.Record.Where(x => x.ISBN.ToString() == query).FirstOrDefaultAsync();
 
-                var book = await _context.Book.Where(x => x.Barcode == query).FirstOrDefaultAsync();
+                    if (isbnRecord != null)
+                    {
+                        // If the search query matches an existing barcode, redirect to view that copy specifically.
+                        return LocalRedirect($"/Records/Details?id={isbnRecord.Id}");
+                    }
 
-                if (book != null)
-                {
-                    // If the search query matches an existing barcode, redirect to view that copy specifically.
-                    return LocalRedirect($"/Books/Details?id={book.Id}");
-                }
+                    var book = await _context.Book.Where(x => x.Barcode == query).FirstOrDefaultAsync();
 
-                recordsQuery = recordsQuery.Where(s => s.Title.ToLower().Contains(query.ToLower()));
+                    if (book != null)
+                    {
+                        // If the search query matches an existing barcode, redirect to view that copy specifically.
+                        return LocalRedirect($"/Books/Details?id={book.Id}");
+                    }
+
+                    recordsQuery = recordsQuery.Where(s => s.Title.ToLower().Contains(query.ToLower()));
+                }*/
+
+                // Convert query into database read and send request
+                //Records = await recordsQuery.ToListAsync();
             }
-
-            // Convert query into database read and send request
-            Records = await recordsQuery.ToListAsync();
+            catch { }
 
             return Page();
         }
@@ -106,7 +133,7 @@ namespace WormCat.Razor.Pages
             _logger.LogInformation("Seed");
             _seedDatabase.TrySeed(true);
 
-            return LocalRedirect("/?action=1");
+            return LocalRedirect("/Index/?action=1");
         }
 
         public async Task Clear()

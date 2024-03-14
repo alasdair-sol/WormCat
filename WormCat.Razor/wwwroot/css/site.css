@@ -44,6 +44,34 @@ hr.emphasis {
     text-decoration: inherit;
 }
 
-.link-unstyled-col, .link-unstyled:link, .link-unstyled:hover {
-    text-decoration: inherit !important;
+    .link-unstyled-col, .link-unstyled:link, .link-unstyled:hover {
+        text-decoration: inherit !important;
+    }
+
+.avatar {
+    height: 2.5rem;
+    width: 2.5rem;
 }
+
+.button-a-link {
+    color: #212529 !important;
+    background-color: transparent !important;
+}
+
+    .button-a-link:focus, .button-a-link:hover {
+        color: #fff !important;
+        text-decoration: none !important;
+        background-color: #d3be91 !important
+    }
+
+    .button-a-link.active, .button-a-link:active {
+        color: #fff !important;
+        text-decoration: none !important;
+        background-color: #78c2ad !important
+    }
+
+    .button-a-link.disabled, .button-a-link:disabled {
+        color: #888 !important;
+        pointer-events: none !important;
+        background-color: transparent !important
+    }

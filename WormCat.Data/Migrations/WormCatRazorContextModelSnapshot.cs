@@ -17,7 +17,7 @@ namespace WormCat.Razor.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Proxies:ChangeTracking", false)
                 .HasAnnotation("Proxies:CheckEquality", false)
                 .HasAnnotation("Proxies:LazyLoading", true)
@@ -25,7 +25,7 @@ namespace WormCat.Razor.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("WormCat.Library.Models.Book", b =>
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.Book", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -57,7 +57,7 @@ namespace WormCat.Razor.Migrations
                     b.ToTable("Book");
                 });
 
-            modelBuilder.Entity("WormCat.Library.Models.Container", b =>
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.Container", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -72,14 +72,19 @@ namespace WormCat.Razor.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Container");
                 });
 
-            modelBuilder.Entity("WormCat.Library.Models.Location", b =>
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.Location", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -106,12 +111,17 @@ namespace WormCat.Razor.Migrations
                     b.Property<string>("Town")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Location");
                 });
 
-            modelBuilder.Entity("WormCat.Library.Models.Record", b =>
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.Record", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -142,20 +152,58 @@ namespace WormCat.Razor.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Record");
                 });
 
-            modelBuilder.Entity("WormCat.Library.Models.Book", b =>
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.User", b =>
                 {
-                    b.HasOne("WormCat.Library.Models.Container", "Container")
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.UserGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("OtherUserIds")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserGroups");
+                });
+
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.Book", b =>
+                {
+                    b.HasOne("WormCat.Library.Models.Dbo.Container", "Container")
                         .WithMany("Books")
                         .HasForeignKey("ContainerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WormCat.Library.Models.Record", "Record")
+                    b.HasOne("WormCat.Library.Models.Dbo.Record", "Record")
                         .WithMany("Books")
                         .HasForeignKey("RecordId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -166,25 +214,71 @@ namespace WormCat.Razor.Migrations
                     b.Navigation("Record");
                 });
 
-            modelBuilder.Entity("WormCat.Library.Models.Container", b =>
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.Container", b =>
                 {
-                    b.HasOne("WormCat.Library.Models.Location", "Location")
+                    b.HasOne("WormCat.Library.Models.Dbo.Location", "Location")
                         .WithMany()
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WormCat.Library.Models.Dbo.User", "User")
+                        .WithMany("Containers")
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Location");
+
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WormCat.Library.Models.Container", b =>
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.Location", b =>
+                {
+                    b.HasOne("WormCat.Library.Models.Dbo.User", "User")
+                        .WithMany("Locations")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.Record", b =>
+                {
+                    b.HasOne("WormCat.Library.Models.Dbo.User", "User")
+                        .WithMany("Records")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.UserGroup", b =>
+                {
+                    b.HasOne("WormCat.Library.Models.Dbo.User", "User")
+                        .WithOne("UserGroup")
+                        .HasForeignKey("WormCat.Library.Models.Dbo.UserGroup", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.Container", b =>
                 {
                     b.Navigation("Books");
                 });
 
-            modelBuilder.Entity("WormCat.Library.Models.Record", b =>
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.Record", b =>
                 {
                     b.Navigation("Books");
+                });
+
+            modelBuilder.Entity("WormCat.Library.Models.Dbo.User", b =>
+                {
+                    b.Navigation("Containers");
+
+                    b.Navigation("Locations");
+
+                    b.Navigation("Records");
+
+                    b.Navigation("UserGroup");
                 });
 #pragma warning restore 612, 618
         }

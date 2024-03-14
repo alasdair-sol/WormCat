@@ -1,19 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using WormCat.Data.DataAccess.Interfaces;
 using WormCat.Library.Models;
+using WormCat.Library.Models.Dbo;
 using WormCat.Library.Services;
 
 namespace WormCat.Razor.Pages.Records
 {
     public class CreateModel : PageModel
     {
+        private readonly ILogger<CreateModel> logger;
+        private readonly IRecordAccess recordAccess;
         private readonly WormCat.Data.Data.WormCatRazorContext _context;
         private readonly IRecordUtility _recordUtility;
         private readonly IEnrichedContentService _enrichedContentProvider;
 
-        public CreateModel(WormCat.Data.Data.WormCatRazorContext context, IRecordUtility recordUtility, IEnrichedContentService enrichedContentProvider)
+        public CreateModel(ILogger<CreateModel> logger, IRecordAccess recordAccess, WormCat.Data.Data.WormCatRazorContext context, IRecordUtility recordUtility, IEnrichedContentService enrichedContentProvider)
         {
+            this.logger = logger;
+            this.recordAccess = recordAccess;
             _context = context;
             _recordUtility = recordUtility;
             _enrichedContentProvider = enrichedContentProvider;
@@ -64,20 +71,21 @@ namespace WormCat.Razor.Pages.Records
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
+            ModelState.Remove("Record.UserIds");
+
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            EntityEntry<Book> book = _context.Book.Add(new Book { RecordId = Record.Id, ContainerId = _context.Container?.FirstOrDefault()?.Id ?? -1 });
+            Record? newRecord = await recordAccess.CreateNewAsync(User.Identity.GetUserId(), Record);
 
-            Record.Books = new List<Book>() { book.Entity };
+            if (newRecord == null)
+                return Page();
 
-            EntityEntry<Record> entityEntry = _context.Record.Add(Record);
+            await recordAccess.SaveContextAsync();
 
-            await _context.SaveChangesAsync();
-
-            return LocalRedirect($"/Records/Details?id={entityEntry.Entity.Id}");
+            return LocalRedirect($"/Records/Details?id={newRecord.Id}");
         }
     }
 }

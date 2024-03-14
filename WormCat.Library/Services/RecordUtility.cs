@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using WormCat.Library.Models;
+using WormCat.Library.Models.Dbo;
 
 namespace WormCat.Library.Services
 {

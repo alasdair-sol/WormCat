@@ -14,18 +14,25 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using WormCat.Razor.Areas.Identity.Data;
+using WormCat.Razor.Pages;
+using WormCat.Data.DataAccess.Interfaces;
 
 namespace WormCat.Razor.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<WormCatUser> _signInManager;
+        private readonly UserManager<WormCatUser> _userManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IUserAccess userAccess;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<WormCatUser> signInManager, UserManager<WormCatUser> userManager, ILogger<LoginModel> logger, IUserAccess userAccess)
         {
             _signInManager = signInManager;
+            _userManager = userManager;
             _logger = logger;
+            this.userAccess = userAccess;
         }
 
         /// <summary>
@@ -112,8 +119,19 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
                 if (result.Succeeded)
                 {
+                    WormCatUser wormCatUser = await _userManager.FindByEmailAsync(Input.Email);
+
+                    if (wormCatUser == null)
+                        return NotFound();
+
+                    Library.Models.Dbo.User userDbo = await userAccess.TryCreateNewAsync(wormCatUser.Id);
+
+                    if (userDbo == null)
+                        return NotFound();
+
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }

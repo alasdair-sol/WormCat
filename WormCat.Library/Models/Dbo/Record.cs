@@ -1,10 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WormCat.Library.Models
+namespace WormCat.Library.Models.Dbo
 {
     public class Record
     {
         public int Id { get; set; }
+
+        public virtual string? UserId { get; set; }
+
+        public virtual User? User { get; set; }
 
         public virtual List<Book>? Books { get; set; }
 

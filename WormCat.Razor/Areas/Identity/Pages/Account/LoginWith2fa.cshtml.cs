@@ -11,18 +11,19 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using WormCat.Razor.Areas.Identity.Data;
 
 namespace WormCat.Razor.Areas.Identity.Pages.Account
 {
     public class LoginWith2faModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<WormCatUser> _signInManager;
+        private readonly UserManager<WormCatUser> _userManager;
         private readonly ILogger<LoginWith2faModel> _logger;
 
         public LoginWith2faModel(
-            SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager,
+            SignInManager<WormCatUser> signInManager,
+            UserManager<WormCatUser> userManager,
             ILogger<LoginWith2faModel> logger)
         {
             _signInManager = signInManager;

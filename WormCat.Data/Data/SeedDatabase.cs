@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WormCat.Data.Data;
-using WormCat.Library.Models;
+using WormCat.Library.Models.Dbo;
 
 namespace WormCat.Razor.Models
 {
@@ -39,32 +39,37 @@ namespace WormCat.Razor.Models
 
                 Clear();
 
-                Location location = new Location()
+              /*  
+               *  Location location = new Location()
                 {
                     Name = "Home",
                     StreetNumber = "49a",
                     StreetName = "Royal St.",
                     City = "Inverclyde",
-                    PostCode = "PA19 1PP"
+                    PostCode = "PA19 1PP",
+                    UserIds = new List<string> { "b60204ac-0961-44cb-9fbe-90d5946d8b11" }
                 };
 
                 Container bookshelfContainer = new Container()
                 {
                     Name = "Bookshelf",
-                    Location = location
+                    Location = location,
+                    UserIds = new List<string> { "b60204ac-0961-44cb-9fbe-90d5946d8b11" }
                 };
 
                 Container storageBoxContainer = new Container()
                 {
                     Name = "Storage Box 001",
-                    Location = location
+                    Location = location,
+                    UserIds = new List<string> { "b60204ac-0961-44cb-9fbe-90d5946d8b11" }
                 };
 
 
                 Container storageBoxContainer2 = new Container()
                 {
                     Name = "Storage Box 002",
-                    Location = location
+                    Location = location,
+                    UserIds = new List<string> { "b60204ac-0961-44cb-9fbe-90d5946d8b11" }
                 };
 
                 context.Container.AddRange(bookshelfContainer, storageBoxContainer, storageBoxContainer2);
@@ -73,6 +78,7 @@ namespace WormCat.Razor.Models
                      new Record()
                      {
                          Title = "Black Sheep",
+                         UserIds = new List<string> { "b60204ac-0961-44cb-9fbe-90d5946d8b11" },
                          Author = "Rachel Harrison",
                          Synopsis = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Eget nullam non nisi est sit. Tellus at urna condimentum mattis pellentesque id. Nibh mauris cursus mattis molestie a iaculis at. Venenatis cras sed felis eget. Arcu vitae elementum curabitur vitae nunc sed velit dignissim sodales. Est lorem ipsum dolor sit amet consectetur adipiscing elit pellentesque. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Maecenas ultricies mi eget mauris pharetra et. Nibh praesent tristique magna sit amet purus gravida quis. Scelerisque felis imperdiet proin fermentum leo vel. At elementum eu facilisis sed odio. Lacinia quis vel eros donec ac odio tempor orci dapibus. Pellentesque dignissim enim sit amet venenatis urna. Mus mauris vitae ultricies leo integer malesuada nunc vel risus. Fermentum odio eu feugiat pretium nibh ipsum. Ac orci phasellus egestas tellus rutrum tellus pellentesque.",
                          ISBN = "9781803367422",
@@ -86,6 +92,7 @@ namespace WormCat.Razor.Models
                     new Record()
                     {
                         Title = "The Witcher: Time of Contempt",
+                        UserIds = new List<string> { "b60204ac-0961-44cb-9fbe-90d5946d8b11" },
                         Author = "Andrzej Sapkowski",
                         Synopsis = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Eget nullam non nisi est sit. Tellus at urna condimentum mattis pellentesque id. Nibh mauris cursus mattis molestie a iaculis at. Venenatis cras sed felis eget. Arcu vitae elementum curabitur vitae nunc sed velit dignissim sodales. Est lorem ipsum dolor sit amet consectetur adipiscing elit pellentesque. Pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Maecenas ultricies mi eget mauris pharetra et. Nibh praesent tristique magna sit amet purus gravida quis. Scelerisque felis imperdiet proin fermentum leo vel. At elementum eu facilisis sed odio. Lacinia quis vel eros donec ac odio tempor orci dapibus. Pellentesque dignissim enim sit amet venenatis urna. Mus mauris vitae ultricies leo integer malesuada nunc vel risus. Fermentum odio eu feugiat pretium nibh ipsum. Ac orci phasellus egestas tellus rutrum tellus pellentesque.",
                         ISBN = "9781473231092",
@@ -101,6 +108,7 @@ namespace WormCat.Razor.Models
                     new Record()
                     {
                         Title = "The Witcher: Baptism of Fire",
+                        UserIds = new List<string> { "b60204ac-0961-44cb-9fbe-90d5946d8b11" },
                         Author = "Andrzej Sapkowski",
                         Synopsis = "A ruddy good witching book",
                         ISBN = "9781473231108",
@@ -108,12 +116,13 @@ namespace WormCat.Razor.Models
                         ,
                         Books = new List<Book>()
                         {
-                            
+
                         }
                     },
                     new Record()
                     {
                         Title = "The Outsiders",
+                        UserIds = new List<string> { "b60204ac-0961-44cb-9fbe-90d5946d8b11" },
                         Author = "Stephen King",
                         Synopsis = "A ruddy good witching book",
                         ISBN = "9781473676398",
@@ -127,6 +136,7 @@ namespace WormCat.Razor.Models
                     new Record()
                     {
                         Title = "Royal Assassin",
+                        UserIds = new List<string> { "b60204ac-0961-44cb-9fbe-90d5946d8b11" },
                         Author = "Robin Hobb",
                         Synopsis = "hello its me",
                         ISBN = "9781231231231",
@@ -140,6 +150,7 @@ namespace WormCat.Razor.Models
                     new Record()
                     {
                         Title = "Billy Summers",
+                        UserIds = new List<string> { "b60204ac-0961-44cb-9fbe-90d5946d8b11" },
                         Author = "Stephen King",
                         Synopsis = "A stephen king novel",
                         ISBN = "9781231231231",
@@ -150,7 +161,7 @@ namespace WormCat.Razor.Models
                             new Book() { Barcode = "0006", Container = bookshelfContainer }
                         }
                     }
-                );
+                );*/
 
                 context.SaveChanges();
             }

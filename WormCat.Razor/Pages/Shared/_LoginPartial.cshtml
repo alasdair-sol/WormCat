@@ -1,23 +1,29 @@
-﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+﻿@using WormCat.Razor.Areas.Identity.Data
+@inject SignInManager<WormCatUser> SignInManager
+@inject UserManager<WormCatUser> UserManager
 
 <ul class="navbar-nav h-100">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-         <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item dropdown d-flex avatar justify-content-center align-items-center rounded-circle bg-primary ml-auto">
+            <a class="text-light dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false" asp-area="Identity" asp-page="/Account/Manage/Index">AH</a>
+
+            <ul class="dropdown-menu" style="transform:translate(-80%, 0%)" aria-labelledby="navbarDropdownMenuLink">
+                <li>
+                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Account</a>
+                </li>
+                <li>
+                    <form class="form-inline mb-0 " asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
+                        <button type="submit" class="button-a-link nav-link dropdown-item text-dark pt-1 pb-1"><span class="ml-3 mr-3">Logout</span></button>
+                    </form>
+                </li>
+            </ul>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+    }
 </ul>

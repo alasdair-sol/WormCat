@@ -1,4 +1,4 @@
-﻿using WormCat.Library.Models;
+﻿using WormCat.Library.Models.Dbo;
 
 namespace WormCat.Library.Services
 {

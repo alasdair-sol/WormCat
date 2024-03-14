@@ -68,7 +68,7 @@
 
     @if (Model?.Records?.Count <= 0)
     {
-        <p class="text-muted">You haven't added any Records yet. <a asp-page="/Records/Create" asp-route-fromSearchQuery="@Model.query">Add a new record?</a></p>
+        <p class="text-muted">You haven't added any Records yet. <a asp-page="/Records/Create">Add a new record?</a></p>
     }
 
     <div class="container pt-2">
