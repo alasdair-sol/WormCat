@@ -4,7 +4,9 @@ namespace WormCat.Data.DataAccess.Interfaces
 {
     public interface IUserAccess
     {
-        Task<User?> TryCreateNewAsync(string id);
-        Task<User?> GetAsync(string id);
+        Task<User?> TryCreateNewAsync(string id, string customUsername, string email);
+        Task<User?> GetUserById(string id);
+        Task<User?> FindUserByCustomUsernameOrEmailAddressOrId(string? value);
+        Task<string?> GetUsernameByUserId(string id);
     }
 }

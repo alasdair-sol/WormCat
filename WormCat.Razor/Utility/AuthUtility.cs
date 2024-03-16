@@ -1,12 +1,20 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using WormCat.Razor.Areas.Identity.Data;
 
 namespace WormCat.Razor.Utility
 {
-    public static class AuthUtility
+    public class AuthUtility : IAuthUtility
     {
-        public static async Task<bool> CustomUsernameTaken(UserManager<WormCatUser> userManager, string customUsername)
+        private readonly UserManager<WormCatUser> _userManager;
+
+        public AuthUtility(UserManager<WormCatUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
+        public async Task<bool> CustomUsernameTakenAsync(UserManager<WormCatUser> userManager, string customUsername)
         {
             try
             {
@@ -17,6 +25,16 @@ namespace WormCat.Razor.Utility
             catch { }
 
             return true;
+        }
+
+        public async Task<string?> GetCustomUsernameByIdAsync(string userId)
+        {
+            WormCatUser? wormCatUser = await _userManager.FindByIdAsync(userId);
+
+            if (wormCatUser == null)
+                return null;
+
+            return wormCatUser.CustomUsername;
         }
     }
 }

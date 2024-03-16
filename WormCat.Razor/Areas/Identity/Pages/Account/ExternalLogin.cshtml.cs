@@ -31,7 +31,8 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
         private readonly IUserStore<WormCatUser> _userStore;
         private readonly IUserEmailStore<WormCatUser> _emailStore;
         private readonly IEmailSender _emailSender;
-        private readonly IUserAccess userAccess;
+        private readonly IUserAccess _userAccess;
+        private readonly IAuthUtility _authUtility;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
@@ -40,7 +41,8 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
             IUserStore<WormCatUser> userStore,
             ILogger<ExternalLoginModel> logger,
             IEmailSender emailSender,
-            IUserAccess userAccess)
+            IUserAccess userAccess,
+            IAuthUtility authUtility)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -48,7 +50,8 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _logger = logger;
             _emailSender = emailSender;
-            this.userAccess = userAccess;
+            _userAccess = userAccess;
+            _authUtility = authUtility;
         }
 
         /// <summary>
@@ -133,7 +136,7 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
                     return NotFound();
                 }
 
-                Library.Models.Dbo.User userDbo = await userAccess.TryCreateNewAsync(wormCatUser.Id);
+                Library.Models.Dbo.User userDbo = await _userAccess.TryCreateNewAsync(wormCatUser.Id, wormCatUser.CustomUsername, wormCatUser.Email);
 
                 if (userDbo == null)
                 {
@@ -186,7 +189,7 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
 
-            bool customUsernameTaken = await AuthUtility.CustomUsernameTaken(_userManager, Input.CustomUsername);
+            bool customUsernameTaken = await _authUtility.CustomUsernameTakenAsync(_userManager, Input.CustomUsername);
 
             if (customUsernameTaken)
             {

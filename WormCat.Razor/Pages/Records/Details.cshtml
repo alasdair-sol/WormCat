@@ -2,6 +2,7 @@
 @model WormCat.Razor.Pages.Records.DetailsModel
 
 @using WormCat.Library.Services
+@using WormCat.Library.Services.Interfaces
 @inject IAuthDisplayService authDisplayUtility;
 @inject IRecordUtility recordUtility;
 
@@ -153,7 +154,7 @@
                                     }
                                     else
                                     {
-                                        <p class="card-text text-danger">Not available</p>
+                                        <p class="card-text text-danger">No copies</p>
                                     }
                                 </td>
                                 <td class="d-flex">

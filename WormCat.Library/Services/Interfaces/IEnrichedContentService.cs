@@ -1,6 +1,6 @@
 ﻿using WormCat.Library.Models;
 
-namespace WormCat.Library.Services
+namespace WormCat.Library.Services.Interfaces
 {
     public interface IEnrichedContentService
     {

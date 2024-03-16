@@ -23,7 +23,7 @@ namespace WormCat.Razor.Pages.Containers
 
         public async Task OnGetAsync(string userId)
         {
-            Container = await containerAccess.GetAllForUserAsync(User.Identity.GetUserId());
+            Container = await containerAccess.GetAllForUserAsync(User.Identity.GetUserId(), true);
         }
     }
 }

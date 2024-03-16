@@ -5,9 +5,11 @@ using WormCat.Data.Data;
 using WormCat.Data.DataAccess;
 using WormCat.Data.DataAccess.Interfaces;
 using WormCat.Library.Services;
+using WormCat.Library.Services.Interfaces;
 using WormCat.Razor.Areas.Identity.Data;
 using WormCat.Razor.Data;
 using WormCat.Razor.Models;
+using WormCat.Razor.Utility;
 
 var builder = CreateBuilder(args);
 
@@ -81,14 +83,18 @@ static void ConfigureServices(IConfigurationManager config, IServiceCollection s
     services.AddSingleton<IAuthDisplayService, AuthDisplayServiceDev>();
     services.AddSingleton<IGenericService, GenericService>();
     services.AddSingleton<IRecordUtility, RecordUtility>();
+    services.AddTransient<IAuthUtility, AuthUtility>();
 
     services.AddSingleton<IEnrichedContentService, EnrichedContentServiceGoogle>();
+    services.AddSingleton<IErrorCodeService, ErrorCodeService>();
 
     services.AddScoped<IUserAccess, UserAccess>();
     services.AddScoped<IRecordAccess, RecordAccess>();
     services.AddScoped<IContainerAccess, ContainerAccess>();
     services.AddScoped<IBookAccess, BookAccess>();
     services.AddScoped<ILocationAccess, LocationAccess>();
+    services.AddScoped<IUserGroupAccess, UserGroupAccess>();
+    services.AddScoped<IUserGroupInviteAccess, UserGroupInviteAccess>();
 
     services.AddScoped<SeedDatabase>();
 

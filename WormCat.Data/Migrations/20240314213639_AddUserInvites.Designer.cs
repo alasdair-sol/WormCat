@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WormCat.Data.Data;
 
@@ -11,9 +12,11 @@ using WormCat.Data.Data;
 namespace WormCat.Razor.Migrations
 {
     [DbContext(typeof(WormCatRazorContext))]
-    partial class WormCatRazorContextModelSnapshot : ModelSnapshot
+    [Migration("20240314213639_AddUserInvites")]
+    partial class AddUserInvites
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

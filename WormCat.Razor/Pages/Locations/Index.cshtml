@@ -2,6 +2,7 @@
 @model WormCat.Razor.Pages.Locations.IndexModel
 
 @using WormCat.Library.Services
+@using WormCat.Library.Services.Interfaces
 @inject IAuthDisplayService authDisplayUtility
 
 @{
@@ -20,6 +21,13 @@
     </div>
 
     <p>Locations are physical places where you can store collections of books. For example, you may have a location for your home, office, and storage unit. Each location can store multiple containers.</p>
+
+    @if (ViewData["success"] != null)
+    {
+        <div class="text-success">@ViewData["success"]</div>
+    }
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 </div>
 
 
@@ -43,7 +51,7 @@
                                 <div class="row">
                                     <div class="col-lg">
                                         <h5 class="card-title"><i class="fa-solid fa-house"></i> @location.Name</h5>
-                                        <h6 class="card-text">@location.UserId</h6>
+                                        <h6 class="card-text">@location.User.CustomUsername</h6>
                                     </div>
                                     <div class="col-lg">
                                         <p class="card-text text-left">
@@ -65,7 +73,7 @@
                                     </a>
 
                                     <form method="post" class=" w-100">
-                                        <button class="btn btn-danger @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center" asp-page="Delete" asp-route-id="@location.Id" type="submit">
+                                        <button class="btn btn-danger @authDisplayUtility.CSSAuthDisabled w-100 d-flex align-items-center justify-content-center" asp-page="Delete" asp-route-id="@location.Id" asp-route-returnUrl="@Model.RedirectDeleteUrl" type="submit">
                                             @if (User?.Identity?.IsAuthenticated == false)
                                             {
                                                 <i class="fa-solid fa-lock mr-2 ml-n2"></i>

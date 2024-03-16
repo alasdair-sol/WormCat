@@ -7,13 +7,17 @@ namespace WormCat.Library.Models.Dbo
     {
         public int Id { get; set; }
 
+        /// <summary>
+        /// The user who has been given access
+        /// </summary>
         [Required]
         public virtual string UserId { get; set; }
 
-        // The Root user for this group
         public virtual User? User { get; set; }
 
-        // All other users in this group
+        /// <summary>
+        /// The user accounts that [User/UserId] can access
+        /// </summary>
         public List<string>? OtherUserIds { get; set; } = default!;
     }
 }

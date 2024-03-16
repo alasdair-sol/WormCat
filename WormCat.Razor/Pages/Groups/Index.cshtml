@@ -1,0 +1,212 @@
+﻿@page
+@model IndexModel
+
+@using WormCat.Library.Models.Dbo
+@using WormCat.Library.Services
+@using WormCat.Library.Services.Interfaces
+@using WormCat.Razor.Areas.Identity.Data
+@inject IAuthDisplayService authDisplayUtility
+@inject UserManager<WormCatUser> um;
+
+@{
+    ViewData["Title"] = "Groups";
+}
+
+@* Title bar *@
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <h2>Groups</h2>
+        </div>
+        <div class="col-sm-auto">
+            <a asp-page="Create" class="w-100 btn btn-primary d-md-none"><i class="fa-solid fa-plus"></i> Add New</a>
+        </div>
+    </div>
+
+    <p>Groups allow you to view, edit, and collaborate with other users of WormCat. Simply invite someone below, if you know their username or email address.</p>
+    <p class="text-black">Note: this user will have access to view and edit your catalogue.</p>
+
+    <form method="post" asp-page-handler="SendInvite">
+        <div class="row">
+            <div class="form-group col pr-0">
+                <label class="control-label"></label>
+                <input name="targetUser" class="form-control" placeholder="Username or email" />
+            </div>
+            <div class="form-group col-auto pl-3">
+                <input type="submit" class="form-control btn btn-primary mt-2" value="Invite" />
+            </div>
+        </div>
+        <div class="row">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        </div>
+        @if (ViewData["success"] != null)
+        {
+            <div class="text-success">@ViewData["success"]</div>
+        }
+    </form>
+</div>
+
+<hr />
+
+<div class="container mb-4">
+    <div class="row">       
+        @* Invites Sent *@
+        <div class="col-6">
+            <h4>Invites Sent</h4>
+            <div>
+                @if (Model.InvitesSentDisplayModels.Count > 0)
+                {
+                    foreach (var invite in Model.InvitesSentDisplayModels)
+                    {
+                        <div class="card">
+                            <div class="card-body pt-2 pb-2 row">
+                                <div class="card-title align-items-center mb-0 col-lg align-items-center d-flex">
+                                    <span @* style="white-space:nowrap; overflow:hidden" *@><b>[@invite.UsernameTo]</b> has been invited to access your group</span>
+                                </div>
+                                <div class="col-lg-auto mt-2 mt-lg-0">
+                                    <div class="row m-0">
+                                        <form class="mb-0 d-inline" method="post" asp-page-handler="CancelInvite" asp-route-inviteId="@invite.Id">
+                                            <div class="row">
+                                                <div class="form-group col-auto m-0">
+                                                    <input type="submit" class=" m-0 btn btn-danger" value="Cancel" />
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No invites sent</p>
+                }
+            </div>
+        </div>
+
+        @* Invites Received *@
+        <div class="col-6">
+            <h4>Invites Received</h4>
+            <div>
+                @if (Model.InvitesReceivedDisplayModels.Count > 0)
+                {
+                    foreach (var invite in Model.InvitesReceivedDisplayModels)
+                    {
+                        <div class="card">
+                            <div class="card-body pt-2 pb-2  row">
+                                <div class="card-title align-items-center mb-0 col-lg align-items-center d-flex">
+                                    <span><b>[@invite.UsernameFrom]</b> has invited you to their group</span>
+                                </div>
+                                <div class="col-lg-auto  mt-2 mt-lg-0">
+                                    <div class="row  m-0">
+                                        <form class="mb-0 d-inline" method="post" asp-page-handler="AcceptInvite" asp-route-inviteId="@invite.Id">
+                                            <div class="row">
+                                                <div class="form-group col-auto pl-3 m-0">
+                                                    <input type="submit" class=" btn btn-primary" value="Accept" />
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <form class="mb-0 d-inline pl-3" method="post" asp-page-handler="DeclineInvite" asp-route-inviteId="@invite.Id">
+                                            <div class="row">
+                                                <div class="form-group col-auto m-0">
+                                                    <input type="submit" class=" btn btn-danger" value="Decline" />
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No invites received</p>
+                }
+            </div>
+        </div>
+    </div>
+    <hr />
+</div>
+
+<div class="container mb-4">
+    <div class="row">
+
+        @* Users Group *@
+        <div class="col-6">
+            <h4>Your Group</h4>
+
+            @if (Model.UsersWhoCanAccessCurrentUserGroup != null && Model.UsersWhoCanAccessCurrentUserGroup.Count > 0)
+            {
+                <p>The following users have access to your group</p>
+                <div>
+                    @foreach (var item in Model.UsersWhoCanAccessCurrentUserGroup)
+                    {
+                        <div class="card">
+                            <div class="card-body pt-2 pb-2  row">
+                                <div class="card-title align-items-center mb-0 col-lg align-items-center d-flex">
+                                    <span><b>[@item.AccessCustomUsername]</b></span>
+                                </div>
+                                <div class="col-lg-auto  mt-2 mt-lg-0">
+                                    <div class="row  m-0">
+                                        <form class="mb-0 d-inline pl-3" method="post" asp-page-handler="RemoveUserFromGroup" asp-route-groupId="@item.GroupId" asp-route-userId="@item.RootUserId">
+                                            <div class="row">
+                                                <div class="form-group col-auto m-0">
+                                                    <input type="submit" class=" btn btn-danger" value="Remove" />
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>You haven't added anyone to your group yet</p>
+            }
+        </div>
+
+        @* Groups user has access to *@
+        <div class="col-6">
+            <h4>Your Access</h4>
+
+            @if (Model.GroupsUserCanAccess != null && Model.GroupsUserCanAccess.Count > 0)
+            {
+                <p>You have access to these user's groups</p>
+                <div>
+                    @foreach (var item in Model.GroupsUserCanAccess)
+                    {
+                        <div class="card">
+                            <div class="card-body pt-2 pb-2  row">
+                                <div class="card-title align-items-center mb-0 col-lg align-items-center d-flex">
+                                    <span><b>[@item.RootCustomUsername]</b></span>
+                                </div>
+                                <div class="col-lg-auto  mt-2 mt-lg-0">
+                                    <div class="row  m-0">
+                                        <form class="mb-0 d-inline pl-3" method="post" asp-page-handler="RemoveUserFromGroup" asp-route-groupId="@item.GroupId" asp-route-userId="@item.RootUserId">
+                                            <div class="row">
+                                                <div class="form-group col-auto m-0">
+                                                    <input type="submit" class=" btn btn-danger" value="Leave" />
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>You haven't been added to another user's group yet</p>
+            }
+        </div>
+
+    </div>
+    <hr />
+</div>

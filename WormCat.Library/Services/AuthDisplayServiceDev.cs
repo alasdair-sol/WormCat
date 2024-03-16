@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using System.Security.Principal;
+using WormCat.Library.Services.Interfaces;
 
 namespace WormCat.Library.Services
 {

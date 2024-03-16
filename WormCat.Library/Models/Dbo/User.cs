@@ -14,9 +14,9 @@ namespace WormCat.Library.Models.Dbo
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Id { get; set; }
-        //public List<int>? LocationIds { get; set; }
-        //public List<int>? ContainerIds { get; set; }
-        //public List<int>? RecordIds { get; set; }
+        
+        public string CustomUsername { get; set; }
+        public string Email { get; set; }
 
         public virtual List<Location>? Locations { get; set; }
         public virtual List<Container>? Containers { get; set; }

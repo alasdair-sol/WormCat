@@ -2,6 +2,7 @@
 @model WormCat.Razor.Pages.Records.CreateModel
 
 @using WormCat.Library.Services
+@using WormCat.Library.Services.Interfaces
 @inject IRecordUtility recordUtility;
 
 @{
@@ -49,6 +50,12 @@
                 <input id="inputRecordISBN" asp-for="Record.ISBN" class="form-control" />
                 <a id="hrefFetchEnrichedData" asp-page="Create" asp-page-handler="CreateFromContentProvider" asp-route-query="@enrichedISBNToken">Fetch enriched data?</a>
                 <span asp-validation-for="Record.ISBN" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChosenContainer" class="control-label"></label>
+                <select asp-for="ChosenContainer.Id" asp-items="Model.Containers" class="form-control"></select>
+                <span asp-validation-for="ChosenContainer" class="text-danger"></span>
+                <p class="text-warning">Note: This record will not belong to you if you add it to another user's container</p>
             </div>
             <div class="form-group">
                 <label asp-for="Record.Title" class="control-label"></label>

@@ -2,6 +2,7 @@
 @model WormCat.Razor.Pages.Containers.IndexModel
 
 @using WormCat.Library.Services
+@using WormCat.Library.Services.Interfaces
 @inject IAuthDisplayService authDisplayUtility
 
 @{
@@ -42,7 +43,7 @@
                     <div class="row">
                         <div class="card-body h-100 ">
                             <h5 class="card-title"><i class="fa-solid fa-box-open"></i> @container.Name</h5>
-                            <h6 class="card-text">@container.UserId</h6>
+                            <h6 class="card-text">@container.User.CustomUsername</h6>
                             <p class="card-text">
                                 Available at @container.Location?.Name
                                 <br />

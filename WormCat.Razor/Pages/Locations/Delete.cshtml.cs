@@ -2,7 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using WormCat.Data.DataAccess.Interfaces;
+using WormCat.Library.Models;
 using WormCat.Library.Models.Dbo;
+using WormCat.Library.Services.Interfaces;
+using WormCat.Razor.Utility;
 
 namespace WormCat.Razor.Pages.Locations
 {
@@ -10,10 +14,14 @@ namespace WormCat.Razor.Pages.Locations
     public class DeleteModel : PageModel
     {
         private readonly WormCat.Data.Data.WormCatRazorContext _context;
+        private readonly ILocationAccess _locationAccess;
+        private readonly IErrorCodeService _errorCodeService;
 
-        public DeleteModel(WormCat.Data.Data.WormCatRazorContext context)
+        public DeleteModel(WormCat.Data.Data.WormCatRazorContext context, ILocationAccess locationAccess, IErrorCodeService errorCodeService)
         {
             _context = context;
+            _locationAccess = locationAccess;
+            _errorCodeService = errorCodeService;
         }
 
         [BindProperty]
@@ -39,22 +47,23 @@ namespace WormCat.Razor.Pages.Locations
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int? id)
+        public async Task<IActionResult> OnPostAsync(int? id, string? returnUrl)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var location = await _context.Location.FindAsync(id);
-            if (location != null)
+            returnUrl ??= "./Index";
+
+            TaskResponseErrorCode<bool> response = await _locationAccess.DeleteLocationAsync(User.GetUserId<string>(), id);
+
+            if (response.Result == false)
             {
-                Location = location;
-                _context.Location.Remove(Location);
-                await _context.SaveChangesAsync();
+                return Redirect($"{returnUrl}?ec={response.ErrorCode}");
             }
 
-            return RedirectToPage("./Index");
+            return Redirect(returnUrl);
         }
     }
 }

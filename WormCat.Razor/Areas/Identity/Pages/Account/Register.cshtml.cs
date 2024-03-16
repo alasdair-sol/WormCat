@@ -32,13 +32,15 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<WormCatUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IAuthUtility _authUtility;
 
         public RegisterModel(
             UserManager<WormCatUser> userManager,
             IUserStore<WormCatUser> userStore,
             SignInManager<WormCatUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IAuthUtility authUtility)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -46,6 +48,7 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _authUtility = authUtility;
         }
 
         /// <summary>
@@ -124,7 +127,7 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            bool customUsernameTaken = await AuthUtility.CustomUsernameTaken(_userManager, Input.CustomUsername);
+            bool customUsernameTaken = await _authUtility.CustomUsernameTakenAsync(_userManager, Input.CustomUsername);
 
             if (customUsernameTaken)
             {

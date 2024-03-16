@@ -9,9 +9,11 @@ using Newtonsoft.Json.Linq;
 using System.Drawing;
 using System.Net;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Web;
 using WormCat.Library.Models;
 using WormCat.Library.Models.GoogleBooks;
+using WormCat.Library.Services.Interfaces;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WormCat.Library.Services
@@ -29,7 +31,7 @@ namespace WormCat.Library.Services
             _logger = logger;
             _httpServiceDefault = httpServiceDefault;
             _httpServiceGoogleBooks = httpServiceGoogleBooks;
-        }   
+        }
 
         /// <summary>
         /// Returns a list of enriched book content from Google Books Api
@@ -78,7 +80,7 @@ namespace WormCat.Library.Services
                     model.Author ??= volume.VolumeInfo?.Authors?.FirstOrDefault() ?? string.Empty;
                     model.PublicationDate ??= volume.VolumeInfo?.PublishedDate ?? string.Empty;
                     model.PageCount ??= volume.VolumeInfo?.PageCount ?? 0;
-                    model.Synopsis ??= volume.SearchInfo?.TextSnippet ?? string.Empty;
+                    model.Synopsis ??= HttpUtility.HtmlDecode(volume.SearchInfo?.TextSnippet ?? string.Empty);
                     model.Image ??= volume.VolumeInfo?.ImageLinks?.Thumbnail ?? string.Empty;
 
                     // Break after first iteration as that will be the most relevant volume

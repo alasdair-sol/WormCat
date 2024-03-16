@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Security.Claims
 @model WormCat.Razor.Pages.Books.EditModel
 
 @{
@@ -9,7 +10,7 @@
 <hr />
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Book.Id" />
@@ -28,16 +29,17 @@
                 <input asp-for="Book.Barcode" class="form-control" />
                 <span asp-validation-for="Book.Barcode" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group hidden">
                 <label asp-for="Book.Record" class="control-label"></label>
-                <select asp-for="Book.RecordId" class="form-control" asp-items="Model.Records"></select>
+                <input asp-for="Book.RecordId" value="@Model.Book.RecordId" />
                 <span asp-validation-for="Book.Record" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="Book.Container" class="control-label"></label>
-                <select asp-for="Book.ContainerId" asp-items="Model.Containers"></select>
+                <select id="containerSelect" asp-for="Book.ContainerId" asp-items="Model.Containers"></select>
                 <span asp-asp-validation-for="Book.Container" class="text-danger"></span>
+                <p class="text-warning">Note: Moving to another user's container will change the ownership of this copy</p>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -51,5 +53,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

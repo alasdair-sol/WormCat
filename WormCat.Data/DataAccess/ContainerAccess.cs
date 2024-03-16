@@ -17,8 +17,15 @@ namespace WormCat.Data.DataAccess
             this.context = context;
         }
 
-        public async Task<Container> CreateNewAsync(Container container)
+        public async Task<Container?> CreateNewAsync(Container container)
         {
+            var location = await context.Location.FindAsync(container.LocationId);
+
+            if (location == null)
+                return null;
+
+            container.UserId = location.UserId;
+
             var entity = await context.Container.AddAsync(container);
             return entity.Entity;
         }
@@ -29,9 +36,21 @@ namespace WormCat.Data.DataAccess
             return result;
         }
 
-        public async Task<List<Container>> GetAllForUserAsync(string userId)
+        public async Task<List<Container>> GetAllForUserAsync(string userId, bool includeGroups)
         {
             List<Container> result = await context.Container.Where(x => x.UserId == userId).ToListAsync();
+
+            if (includeGroups)
+            {
+                var userGroup = await context.UserGroups.Where(x => x.UserId == userId).FirstOrDefaultAsync();
+
+                foreach (var otherUserId in userGroup?.OtherUserIds ?? new List<string>())
+                {
+                    var otherUserContainers = await context.Container.Where(x => x.UserId == otherUserId).ToListAsync();
+                    result.AddRange(otherUserContainers);
+                }
+            }
+
             return result;
         }
 

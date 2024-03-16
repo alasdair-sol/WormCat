@@ -13,6 +13,9 @@
                     <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Account</a>
                 </li>
                 <li>
+                    <a class="dropdown-item" asp-area="" asp-page="/Groups/Index">Groups</a>
+                </li>
+                <li>
                     <form class="form-inline mb-0 " asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
                         <button type="submit" class="button-a-link nav-link dropdown-item text-dark pt-1 pb-1"><span class="ml-3 mr-3">Logout</span></button>
                     </form>

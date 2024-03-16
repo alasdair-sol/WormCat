@@ -2,21 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using WormCat.Razor.Areas.Identity.Data;
-using WormCat.Razor.Pages;
+using System.ComponentModel.DataAnnotations;
 using WormCat.Data.DataAccess.Interfaces;
+using WormCat.Razor.Areas.Identity.Data;
 
 namespace WormCat.Razor.Areas.Identity.Pages.Account
 {
@@ -127,7 +119,7 @@ namespace WormCat.Razor.Areas.Identity.Pages.Account
                     if (wormCatUser == null)
                         return NotFound();
 
-                    Library.Models.Dbo.User userDbo = await userAccess.TryCreateNewAsync(wormCatUser.Id);
+                    Library.Models.Dbo.User userDbo = await userAccess.TryCreateNewAsync(wormCatUser.Id, wormCatUser.CustomUsername, wormCatUser.Email);
 
                     if (userDbo == null)
                         return NotFound();

@@ -1,5 +1,9 @@
 ﻿@page
+@using WormCat.Data.DataAccess.Interfaces
+@using WormCat.Razor.Utility
 @model WormCat.Razor.Pages.Containers.CreateModel
+@inject ILogger<WormCat.Razor.Pages.Containers.CreateModel> log;
+@inject ILocationAccess locationAccess
 
 @{
     ViewData["Title"] = "New Container";
@@ -8,26 +12,44 @@
 <h1>New Container</h1>
 <hr />
 
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
+@if (Model?.LocationSelects?.Count() <= 0)
+{
+    <p>You haven't created any locations yet. Please create one, then try again.</p>
+}
+else
+{
+    <form method="post">
+        <div class="row">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+        </div>
+        <div class="row">
+            <div class="col-md form-group">
                 <label asp-for="Container.Name" class="control-label"></label>
-                <input asp-for="Container.Name" class="form-control" />
+                <input asp-for="Container.Name" class="form-control" placeholder="New container" />
                 <span asp-validation-for="Container.Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="col-md form-group">
+                <label asp-for="Container.Location" class="control-label"></label>
+                <select id="selectLocations" asp-for="Container.LocationId" asp-items="Model.LocationSelects" class="form-control"></select>
+                <span asp-validation-for="Container.Location" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md">
+                <p class="text-danger" id="warningMessage">Note: Adding this container to another user's location will belong to another user</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-page="Index">Back to List</a>
-</div>
+        </div>
+    </form>
+}
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

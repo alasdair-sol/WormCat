@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Security.Principal;
 
-namespace WormCat.Library.Services
+namespace WormCat.Library.Services.Interfaces
 {
     public interface IAuthDisplayService
     {

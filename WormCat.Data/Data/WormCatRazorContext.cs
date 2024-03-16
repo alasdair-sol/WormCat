@@ -13,6 +13,7 @@ namespace WormCat.Data.Data
 
         public DbSet<User> Users { get; set; } = default!;
         public DbSet<UserGroup> UserGroups { get; set; } = default!;
+        public DbSet<UserGroupInvite> UserGroupInvite { get; set; } = default!;
         public DbSet<Record> Record { get; set; } = default!;
         public DbSet<Book> Book { get; set; } = default!;
         public DbSet<Container> Container { get; set; } = default!;

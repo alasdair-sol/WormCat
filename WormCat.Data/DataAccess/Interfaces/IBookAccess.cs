@@ -1,4 +1,5 @@
-﻿using WormCat.Library.Models.Dbo;
+﻿using WormCat.Library.Models;
+using WormCat.Library.Models.Dbo;
 
 namespace WormCat.Data.DataAccess.Interfaces
 {
@@ -7,5 +8,6 @@ namespace WormCat.Data.DataAccess.Interfaces
         Task<Book> CreateNewAsync(int recordId, int containerId);
         Task<Book?> CreateNewForRecordAsync(string userId, int recordId);
         Task<Book?> GetAsync(int? id);
+        Task<TaskResponseErrorCode<bool>> UpdateBookAsync(Book book);
     }
 }

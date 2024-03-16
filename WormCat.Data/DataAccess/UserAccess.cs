@@ -19,16 +19,18 @@ namespace WormCat.Data.DataAccess
             this.context = context;
         }
 
-        public async Task<User?> TryCreateNewAsync(string userId)
+        public async Task<User?> TryCreateNewAsync(string userId, string customUsername, string email)
         {
-            var existingUser = await GetAsync(userId);
+            var existingUser = await GetUserById(userId);
 
             if (existingUser != null)
                 return existingUser;
 
             EntityEntry<User> user = await context.Users.AddAsync(new User()
             {
-                Id = userId
+                Id = userId,
+                CustomUsername = customUsername,
+                Email = email
             });
 
             EntityEntry<Library.Models.Dbo.Location> location = await context.Location.AddAsync(new Library.Models.Dbo.Location()
@@ -53,9 +55,24 @@ namespace WormCat.Data.DataAccess
             return user.Entity;
         }
 
-        public async Task<User?> GetAsync(string id)
+        public async Task<User?> GetUserById(string id)
         {
-            User? result = await context.Users.Where(x => x.Id == id).FirstOrDefaultAsync();
+            User? result = await context.Users.FindAsync(id);
+            return result;
+        }
+
+        public async Task<string?> GetUsernameByUserId(string id)
+        {
+            User? result = await context.Users.FindAsync(id);
+            return result?.CustomUsername;
+        }
+
+        public async Task<User?> FindUserByCustomUsernameOrEmailAddressOrId(string? value)
+        {
+            if (value == null)
+                return null;
+
+            User? result = await context.Users.FirstOrDefaultAsync(x => x.CustomUsername == value || x.Email == value || x.Id == value);
             return result;
         }
     }
